@@ -1,0 +1,470 @@
+🪢snap kg_gen5_k4_final_before_snap_v08
+.graph {
+ gen: 5,
+ id: kg5k,
+ name: 'user-agent failure reflection and improvment',
+ operators: None,
+ time: 2026-05-25T00:00Z,
+ types: None,
+ version: 0.8,
+ workspace: './',
+}
+edges {
+ class {
+  action_gate -(FF)h-> object_root,
+  artifact_object -(FF)h-> object_root,
+  claim_object -(FF)h-> object_root,
+  competency_question -(FF)h-> object_root,
+  constraint_object -(FF)h-> object_root,
+  conversation_object -(FF)h-> object_root,
+  evidence_object -(FF)h-> object_root,
+  failure_object -(FF)h-> object_root,
+  mechanism_object -(FF)h-> object_root,
+  provenance_object -(FF)h-> object_root,
+  referent_object -(FF)h-> object_root,
+  repair_object -(FF)h-> object_root,
+  requirement_object -(FF)h-> object_root,
+  status_object -(FF)h-> object_root,
+  stop_object -(FF)h-> object_root,
+  substitution_class -(FF)h-> object_root,
+  surprise_object -(FF)h-> object_root,
+  utility_object -(FF)h-> object_root,
+  verify_operator -(FF)h-> operator_root,
+ }
+ instance {
+  artifact_to_response -(FF)h-> substitution_class,
+  decision_to_more_research -(E0)h-> substitution_class,
+  live_state_to_handoff -(F0)h-> substitution_class,
+  literal_to_approximation -(FF)h-> substitution_class,
+  referent_to_proxy -(FF)h-> substitution_class,
+  visual_to_test -(F0)h-> substitution_class,
+
+  cq_action_governance -(FF)h-> competency_question,
+  cq_claim_evidence -(FF)h-> competency_question,
+  cq_collapse_class -(E0)h-> competency_question,
+  cq_completion_block -(E0)h-> competency_question,
+  cq_user_verbatim -(FF)h-> competency_question,
+
+  artifact_state_gate -(E0)h-> action_gate,
+  evidence_age_gate -(E0)h-> action_gate,
+  forbidden_substitute_gate -(F0)h-> action_gate,
+  fresh_evidence_gate -(E0)h-> action_gate,
+  provenance_chain_gate -(E0)h-> action_gate,
+  referent_first_gate -(F0)h-> action_gate,
+  stop_commit_gate -(C0)h-> action_gate,
+  user_verbatim_anchor_gate -(E0)h-> action_gate,
+
+  constraint_graph_non_persistence -(F0)h-> failure_object,
+  deferred_symbol_resolution_failure -(E0)h-> failure_object,
+  endogenous_finishing_failure -(C0)h-> failure_object,
+  evidence_freshness_failure -(E0)h-> failure_object,
+  modality_verification_failure -(D0)h-> failure_object,
+  non_binding_text_failure -(FF)h-> failure_object,
+  persistent_coordinate_authority_failure -(F0)h-> failure_object,
+  proxy_substitution_under_pressure -(E0)h-> failure_object,
+  referent_chain_provenance_failure -(E0)h-> failure_object,
+  response_shape_artifact_state_confusion -(D0)h-> failure_object,
+  target_substitution_failure -(FF)h-> failure_object,
+ }
+ provenance {
+  corpus_fold_init -(E0)h-> conversation_corpus,
+  corpus_globe2_control_r -(C0)h-> conversation_corpus,
+  corpus_globe2_control_wip -(E0)h-> conversation_corpus,
+  corpus_globe2_gesture_zones -(E0)h-> conversation_corpus,
+  corpus_globe2_radial_sliders -(E0)h-> conversation_corpus,
+  corpus_globe2_slider_tuning -(E0)h-> conversation_corpus,
+  corpus_totem -(C0)h-> conversation_corpus,
+  corpus_wavelet_meta -(C0)h-> conversation_corpus,
+
+  competency_question_layer -(C0)h-> kg_validation_research,
+  edge_family_requirements -(FF)h-> user_promoted_requirements,
+  k4_update -(FF)h-> user_promoted_requirements,
+  kg_gen1 -(80)h-> kg_gen5,
+  kg_gen2 -(A0)h-> kg_gen5,
+  kg_gen3 -(C0)h-> kg_gen5,
+  kg_gen4 -(E0)h-> kg_gen5,
+  kg_gen5 -(FF)h-> snap_spec_v08,
+  trace_completeness_layer -(C0)h-> agent_evaluation_research,
+  user_verbatim_text -(FF)h-> conversation_corpus,
+  vibe_encode_axis -(C0)h-> vibe_encoder_12d,
+ }
+ flow {
+  user_literal_target -(FF)h-> agent_imagined_target_risk,
+  agent_imagined_target_risk -(F0)h-> proxy_action,
+  proxy_action -(E0)h-> false_green_claim,
+  false_green_claim -(E0)h-> user_repair_signal,
+  user_repair_signal -(C0)h-> verification_tail,
+  verification_tail -(C0)h-> kg_gen5,
+
+  kg_gen1 -(80)h-> kg_gen2,
+  kg_gen2 -(A0)h-> kg_gen3,
+  kg_gen3 -(C0)h-> kg_gen4,
+  kg_gen4 -(E0)h-> kg_gen5,
+ }
+ governs {
+  active_constraint_set -(FF)h-> proposed_action,
+  artifact_surface -(E0)h-> completion_claim,
+  evidence_required -(E0)h-> completion_claim,
+  forbidden_substitute_set -(F0)h-> proposed_action,
+  literal_target -(FF)h-> proposed_action,
+  stop_condition -(C0)h-> synthesis_task,
+  user_owned_referent -(FF)h-> proposed_action,
+  user_verbatim_text -(F0)h-> active_constraint_set,
+  user_verbatim_text -(FF)h-> assistant_interpretation,
+  user_verbatim_text -(FF)h-> literal_target,
+ }
+ blocks {
+  ambiguous_referent -(E0)h-> execute_action,
+  artifact_unverified -(E0)h-> claim_completion,
+  missing_fresh_evidence -(FF)h-> claim_completion,
+  missing_user_verbatim_anchor -(FF)h-> promote_requirement,
+  paraphrase_only_requirement -(E0)h-> claim_completion,
+  paraphrase_only_requirement -(E0)h-> execute_action,
+  unresolved_deferred_symbol -(FF)h-> execute_action,
+  unclosed_provenance_chain -(E0)h-> claim_completion,
+  unsettled_constraint_conflict -(FF)h-> execute_action,
+ }
+ requires {
+  assistant_interpretation -(FF)h-> user_verbatim_anchor_check,
+  claim_completion -(E0)h-> cq_claim_evidence,
+  completion_claim -(FF)h-> evidence_required,
+  edit_action -(E0)h-> constraint_touch_check,
+  kg_gen5 -(C0)h-> walkability_audit,
+  promote_requirement -(FF)h-> user_verbatim_text,
+  proposed_action -(E0)h-> cq_action_governance,
+  proposed_action -(E0)h-> user_verbatim_anchor_check,
+  status_claim -(FF)h-> fresh_evidence,
+  substitution_class -(C0)h-> cq_collapse_class,
+  synthesis_task -(C0)h-> closing_due_check,
+  visual_claim -(FF)h-> visual_surface_evidence,
+ }
+ forbids {
+  artifact_state -(F0)h-> response_shaped_completion,
+  evidence_required -(E0)h-> stale_model_text,
+  literal_target -(FF)h-> imagined_target_substitute,
+  real_gradient_requirement -(E0)h-> fake_gradient_approximation,
+  user_owned_referent -(FF)h-> tractable_proxy,
+  user_verbatim_text -(E0)h-> assistant_goal_smoothing,
+  user_verbatim_text -(FF)h-> imagined_goal_replacement,
+ }
+ resolves {
+  cq_action_governance -(E0)h-> active_constraint_set,
+  cq_claim_evidence -(E0)h-> evidence_required,
+  cq_collapse_class -(C0)h-> substitution_class,
+  cq_completion_block -(C0)h-> missing_fresh_evidence,
+  cq_user_verbatim -(E0)h-> user_verbatim_text,
+  inspect_existing_source -(FF)h-> deferred_symbol,
+  live_runtime_check -(E0)h-> current_world_state,
+  lookup_action -(FF)h-> unresolved_deferred_symbol,
+  source_read_this_turn -(E0)h-> literal_claim,
+ }
+ verifies {
+  competency_question_layer -(C0)h-> kg_gen5,
+  constraint_touch_check -(E0)h-> proposed_action,
+  diff_evidence -(C0)h-> prose_preservation_claim,
+  fresh_evidence -(FF)h-> status_claim,
+  provenance_chain -(E0)h-> shipped_claim,
+  trace_completeness_layer -(C0)h-> kg_gen5,
+  user_verbatim_anchor_check -(FF)h-> assistant_interpretation,
+  visual_surface_evidence -(FF)h-> visual_claim,
+  walkability_audit -(E0)h-> kg_gen5,
+ }
+ invalidates {
+  bad_visual_feedback -(FF)h-> artifact_correct_claim,
+  failed_surface_check -(FF)h-> response_shaped_completion,
+  stale_binary -(FF)h-> runtime_success_claim,
+  user_no_substitution -(FF)h-> imagined_goal_replacement,
+  user_no_visible_change -(FF)h-> shipped_claim,
+  user_says_answer_the_mail -(FF)h-> assistant_interpretation,
+  user_says_way_off -(FF)h-> assistant_interpretation,
+  user_wrong_mail_feedback -(FF)h-> completion_claim,
+ }
+ repairs {
+  fresh_runtime_check -(C0)h-> evidence_freshness_failure,
+  user_names_referent -(FF)h-> proxy_substitution_under_pressure,
+  user_restates_invariant -(E0)h-> constraint_graph_non_persistence,
+  user_supplies_deferred_symbol_source -(E0)h-> deferred_symbol_resolution_failure,
+  write_locked_constraint -(80)h-> persistent_coordinate_authority_failure,
+ }
+ caused_by {
+  constraint_graph_non_persistence -(F0)h-> non_binding_text_failure,
+  deferred_symbol_resolution_failure -(D0)h-> non_binding_text_failure,
+  endogenous_finishing_failure -(A0)h-> non_binding_text_failure,
+  evidence_freshness_failure -(C0)h-> non_binding_text_failure,
+  persistent_coordinate_authority_failure -(F0)h-> non_binding_text_failure,
+  proxy_substitution_under_pressure -(D0)h-> non_binding_text_failure,
+  referent_chain_provenance_failure -(C0)h-> non_binding_text_failure,
+  response_shape_artifact_state_confusion -(C0)h-> non_binding_text_failure,
+  target_substitution_failure -(E0)h-> non_binding_text_failure,
+
+  constraint_graph_non_persistence -(E0)h-> target_substitution_failure,
+  deferred_symbol_resolution_failure -(E0)h-> target_substitution_failure,
+  evidence_freshness_failure -(D0)h-> response_shape_artifact_state_confusion,
+  proxy_substitution_under_pressure -(F0)h-> target_substitution_failure,
+  referent_chain_provenance_failure -(D0)h-> modality_verification_failure,
+  response_shape_artifact_state_confusion -(E0)h-> target_substitution_failure,
+ }
+ collapses_to {
+  artifact_to_response -(FF)h-> response_shape_artifact_state_confusion,
+  decision_to_more_research -(E0)h-> endogenous_finishing_failure,
+  live_state_to_handoff -(F0)h-> evidence_freshness_failure,
+  literal_to_approximation -(FF)h-> target_substitution_failure,
+  referent_to_proxy -(FF)h-> proxy_substitution_under_pressure,
+  visual_to_test -(F0)h-> modality_verification_failure,
+
+  checklist_only_fix -(80)h-> non_binding_text_failure,
+  context_only_solution -(E0)h-> non_binding_text_failure,
+  documentation_only_fix -(80)h-> non_binding_text_failure,
+  instruction_repetition -(E0)h-> non_binding_text_failure,
+  perfect_prompt_fidelity -(F0)h-> non_binding_text_failure,
+  subagent_report_only -(80)h-> non_binding_text_failure,
+ }
+ utility {
+  artifact_state_gate -(E0)h-> ui_visual_tasks,
+  closing_due_gate -(C0)h-> planning_synthesis_tasks,
+  competency_question_layer -(C0)h-> future_graph_audits,
+  constraint_touch_gate -(FF)h-> iterative_engineering_tasks,
+  evidence_age_gate -(E0)h-> status_tasks,
+  forbidden_substitute_gate -(FF)h-> precision_literal_tasks,
+  provenance_chain_gate -(E0)h-> toolchain_runtime_tasks,
+  referent_first_gate -(F0)h-> implementation_tasks,
+  trace_completeness_layer -(C0)h-> future_graph_audits,
+  user_verbatim_anchor_gate -(E0)h-> load_bearing_requirement_tasks,
+
+  artifact_to_response -(D0)h-> ui_visual_tasks,
+  decision_to_more_research -(C0)h-> planning_synthesis_tasks,
+  live_state_to_handoff -(D0)h-> status_tasks,
+  literal_to_approximation -(E0)h-> precision_literal_tasks,
+  referent_to_proxy -(E0)h-> implementation_tasks,
+  visual_to_test -(E0)h-> ui_visual_tasks,
+ }
+ status {
+  agent_evaluation_research -(C0)h-> credible_external_support,
+  assistant_paraphrase -(40)h-> weak_evidence,
+  binding_action_governance -(C0)h-> best_current_hypothesis,
+  checklist_only_fix -(40)h-> suspect_intervention,
+  competency_question_layer -(E0)h-> final_generation_addition,
+  context_only_solution -(30)h-> collapsed_impossible_approach,
+  costs_edge_family -(20)h-> rejected_expansion,
+  documentation_only_fix -(30)h-> suspect_intervention,
+  forecasts_edge_family -(20)h-> rejected_expansion,
+  future_graph_audits -(C0)h-> test_candidate,
+  instruction_repetition -(30)h-> collapsed_impossible_approach,
+  kg_validation_research -(C0)h-> credible_external_support,
+  non_binding_text_failure -(E0)h-> promoted_common_mechanism,
+  perfect_prompt_fidelity -(20)h-> collapsed_impossible_approach,
+  substitution_class -(E0)h-> promoted_k4_requirement,
+  subagent_report_only -(40)h-> suspect_intervention,
+  target_substitution_failure -(E0)h-> supported_thesis,
+  tool_gated_control -(C0)h-> test_candidate,
+  trace_completeness_layer -(C0)h-> final_generation_addition,
+  user_verbatim_anchor_check -(E0)h-> test_candidate,
+  user_verbatim_text -(FF)h-> authoritative_evidence,
+ }
+ surprise {
+  artifact_to_response -(C0)h-> global_eigenvector,
+  collapsed_impossible_approach -(D0)h-> global_eigenvector,
+  collapses_to -(E0)h-> global_eigenvector,
+  competency_question_layer -(80)h-> global_eigenvector,
+  constraint_graph_non_persistence -(F0)h-> global_eigenvector,
+  deferred_symbol_resolution_failure -(E0)h-> global_eigenvector,
+  endogenous_finishing_failure -(80)h-> global_eigenvector,
+  evidence_freshness_failure -(C0)h-> global_eigenvector,
+  imagined_goal_replacement -(F0)h-> global_eigenvector,
+  live_state_to_handoff -(C0)h-> global_eigenvector,
+  non_binding_text_failure -(F0)h-> global_eigenvector,
+  referent_chain_provenance_failure -(C0)h-> global_eigenvector,
+  response_shape_artifact_state_confusion -(D0)h-> global_eigenvector,
+  substitution_class -(D0)h-> global_eigenvector,
+  target_substitution_failure -(FF)h-> global_eigenvector,
+  trace_completeness_layer -(80)h-> global_eigenvector,
+  user_verbatim_text -(D0)h-> global_eigenvector,
+ }
+}
+extras { emoji_requirement_handle: '🧩K4', purpose: 'final conversation knowledge engineering graph', }
+layout {}
+literals {}
+nodes {
+ object action_gate$ag01 { type: NodeClass, }
+ object active_constraint_set$ac01 { type: ConstraintSet, }
+ object agent_evaluation_research$ae05 { type: ResearchSource, }
+ object agent_imagined_target_risk$ai01 { type: Risk, }
+ object ambiguous_referent$ar01 { type: Blocker, }
+ object artifact_correct_claim$ak01 { type: Claim, }
+ object artifact_object$ao01 { type: NodeClass, }
+ object artifact_state$as01 { type: ArtifactState, }
+ object artifact_surface$af01 { type: ArtifactSurface, }
+ object artifact_to_response$ar04 { type: SubstitutionClass, }
+ object artifact_unverified$au01 { type: Blocker, }
+ object assistant_goal_smoothing$gs03 { type: FailureMode, }
+ object assistant_interpretation$ai03 { type: Interpretation, }
+ object assistant_paraphrase$ap03 { type: Evidence, }
+ object authoritative_evidence$ae03 { type: Status, }
+ object bad_visual_feedback$bv01 { type: Evidence, }
+ object best_current_hypothesis$bh01 { type: Status, }
+ object binding_action_governance$bg01 { type: Hypothesis, }
+ object checklist_only_fix$cf01 { type: Intervention, }
+ object claim_object$co01 { type: NodeClass, }
+ object collapsed_impossible_approach$ci02 { type: Status, }
+ object competency_question$cq05 { type: NodeClass, }
+ object competency_question_layer$cl05 { type: ValidationLayer, }
+ object completion_claim$cc01 { type: Claim, }
+ object constraint_graph_non_persistence$cg01 { type: FailureMode, }
+ object constraint_object$cj01 { type: NodeClass, }
+ object constraint_touch_check$ct01 { type: Check, }
+ object context_only_solution$cs02 { type: Intervention, }
+ object conversation_corpus$cv01 { type: Corpus, }
+ object conversation_object$cx01 { type: NodeClass, }
+ object corpus_fold_init$fi01 { type: CorpusCase, }
+ object corpus_globe2_control_r$cr01 { type: CorpusCase, }
+ object corpus_globe2_control_wip$cw01 { type: CorpusCase, }
+ object corpus_globe2_gesture_zones$gz01 { type: CorpusCase, }
+ object corpus_globe2_radial_sliders$rs01 { type: CorpusCase, }
+ object corpus_globe2_slider_tuning$st01 { type: CorpusCase, }
+ object corpus_totem$tm01 { type: CorpusCase, }
+ object corpus_wavelet_meta$wm01 { type: CorpusCase, }
+ object costs_edge_family$cf04 { type: RejectedExpansion, }
+ object cq_action_governance$cq01 { type: CompetencyQuestion, }
+ object cq_claim_evidence$cq02 { type: CompetencyQuestion, }
+ object cq_collapse_class$cq03 { type: CompetencyQuestion, }
+ object cq_completion_block$cq04 { type: CompetencyQuestion, }
+ object cq_user_verbatim$cq05 { type: CompetencyQuestion, }
+ object credible_external_support$ce05 { type: Status, }
+ object current_world_state$ws01 { type: Evidence, }
+ object decision_to_more_research$dm04 { type: SubstitutionClass, }
+ object deferred_symbol$ds01 { type: DeferredSymbol, }
+ object deferred_symbol_resolution_failure$dr01 { type: FailureMode, }
+ object diff_evidence$de01 { type: Evidence, }
+ object documentation_only_fix$df01 { type: Intervention, }
+ object edge_family_requirements$ef01 { type: RequirementSet, }
+ object endogenous_finishing_failure$en01 { type: FailureMode, }
+ object evidence_freshness_failure$ev01 { type: FailureMode, }
+ object evidence_object$eo01 { type: NodeClass, }
+ object evidence_required$er01 { type: EvidenceRequirement, }
+ object failed_surface_check$fs01 { type: Evidence, }
+ object fake_gradient_approximation$fg01 { type: ForbiddenSubstitute, }
+ object false_green_claim$fc01 { type: Claim, }
+ object final_generation_addition$fa05 { type: Status, }
+ object forbidden_substitute_set$fb01 { type: ForbiddenSet, }
+ object forecasts_edge_family$ff04 { type: RejectedExpansion, }
+ object fresh_evidence$fe01 { type: Evidence, }
+ object fresh_runtime_check$fr01 { type: Evidence, }
+ object future_graph_audits$fg05 { type: TaskFamily, }
+ object global_eigenvector$ge01 { type: Thesis, }
+ object imagined_goal_replacement$ig03 { type: FailureMode, }
+ object imagined_target_substitute$it01 { type: ForbiddenSubstitute, }
+ object instruction_repetition$ir02 { type: Intervention, }
+ object k4_update$ku04 { type: RequirementSet, }
+ object kg_gen1$kg01 { type: GraphGeneration, }
+ object kg_gen2$kg02 { type: GraphGeneration, }
+ object kg_gen3$kg03 { type: GraphGeneration, }
+ object kg_gen4$kg04 { type: GraphGeneration, }
+ object kg_gen5$kg05 { type: GraphGeneration, }
+ object kg_validation_research$kv05 { type: ResearchSource, }
+ object literal_claim$lc01 { type: Claim, }
+ object literal_target$lt01 { type: Target, }
+ object literal_to_approximation$la04 { type: SubstitutionClass, }
+ object live_state_to_handoff$lh04 { type: SubstitutionClass, }
+ object load_bearing_requirement_tasks$lr04 { type: TaskFamily, }
+ object mechanism_object$mo01 { type: NodeClass, }
+ object missing_fresh_evidence$mf01 { type: Blocker, }
+ object missing_user_verbatim_anchor$ma03 { type: Blocker, }
+ object modality_verification_failure$mv01 { type: FailureMode, }
+ object non_binding_text_failure$nb02 { type: FailureMode, }
+ object object_root$or01 { type: Root, }
+ object operator_root$op01 { type: Root, }
+ object paraphrase_only_requirement$pr03 { type: Blocker, }
+ object perfect_prompt_fidelity$pf02 { type: Intervention, }
+ object persistent_coordinate_authority_failure$pc01 { type: FailureMode, }
+ object precision_literal_tasks$pl01 { type: TaskFamily, }
+ object planning_synthesis_tasks$ps01 { type: TaskFamily, }
+ object promoted_common_mechanism$pm02 { type: Status, }
+ object promoted_k4_requirement$pk04 { type: Status, }
+ object prose_preservation_claim$pp01 { type: Claim, }
+ object provenance_chain$pn01 { type: Provenance, }
+ object provenance_object$po01 { type: NodeClass, }
+ object proxy_action$pa01 { type: Action, }
+ object proxy_substitution_under_pressure$px01 { type: FailureMode, }
+ object real_gradient_requirement$rg01 { type: Requirement, }
+ object referent_chain_provenance_failure$rp01 { type: FailureMode, }
+ object referent_object$ro01 { type: NodeClass, }
+ object referent_to_proxy$rp04 { type: SubstitutionClass, }
+ object rejected_expansion$rx04 { type: Status, }
+ object repair_object$rr01 { type: NodeClass, }
+ object request_object$rq01 { type: NodeClass, }
+ object requirement_object$re01 { type: NodeClass, }
+ object response_shape_artifact_state_confusion$ra01 { type: FailureMode, }
+ object response_shaped_completion$rc01 { type: FailureMode, }
+ object runtime_success_claim$ru01 { type: Claim, }
+ object shipped_claim$sc01 { type: Claim, }
+ object snap_spec_v08$sv08 { type: Specification, }
+ object stale_binary$sb01 { type: Evidence, }
+ object stale_model_text$sm01 { type: EvidenceRisk, }
+ object status_claim$sk01 { type: Claim, }
+ object status_object$so01 { type: NodeClass, }
+ object stop_condition$sn01 { type: StopCondition, }
+ object stop_object$st02 { type: NodeClass, }
+ object subagent_report_only$sr01 { type: Intervention, }
+ object substitution_class$su04 { type: NodeClass, }
+ object supported_thesis$sp01 { type: Status, }
+ object surprise_object$su01 { type: NodeClass, }
+ object suspect_intervention$si01 { type: Status, }
+ object synthesis_task$sy01 { type: Task, }
+ object target_substitution_failure$ts01 { type: FailureMode, }
+ object tool_gated_control$tg01 { type: Intervention, }
+ object toolchain_runtime_tasks$tr01 { type: TaskFamily, }
+ object trace_completeness_layer$tc05 { type: ValidationLayer, }
+ object tractable_proxy$tp01 { type: Proxy, }
+ object ui_visual_tasks$uv01 { type: TaskFamily, }
+ object unresolved_deferred_symbol$ud01 { type: DeferredSymbol, }
+ object unsettled_constraint_conflict$uc01 { type: Blocker, }
+ object unclosed_provenance_chain$up01 { type: Blocker, }
+ object user_literal_target$ul01 { type: Target, }
+ object user_names_referent$un01 { type: RepairSignal, }
+ object user_no_substitution$ns03 { type: Evidence, }
+ object user_no_visible_change$nv01 { type: Evidence, }
+ object user_owned_referent$uo01 { type: Referent, }
+ object user_promoted_requirements$ur01 { type: RequirementSet, }
+ object user_repair_signal$us01 { type: RepairSignal, }
+ object user_restates_invariant$ui01 { type: RepairSignal, }
+ object user_says_answer_the_mail$am03 { type: Evidence, }
+ object user_says_way_off$wo03 { type: Evidence, }
+ object user_supplies_deferred_symbol_source$ux01 { type: RepairSignal, }
+ object user_verbatim_anchor_check$vc03 { type: Check, }
+ object user_verbatim_text$uv03 { type: Evidence, }
+ object user_wrong_mail_feedback$uw01 { type: Evidence, }
+ object utility_object$ut01 { type: NodeClass, }
+ object verification_tail$vt01 { type: VerificationTail, }
+ object vibe_encoder_12d$ve12 { type: Specification, }
+ object visual_claim$vc01 { type: Claim, }
+ object visual_surface_evidence$vs01 { type: Evidence, }
+ object visual_to_test$vt04 { type: SubstitutionClass, }
+ object walkability_audit$wa05 { type: ValidationLayer, }
+ object weak_evidence$we03 { type: Status, }
+ object write_locked_constraint$wl01 { type: RepairSignal, }
+
+ operator artifact_state_gate$at01 { in: { claim: Claim, }, out: { status: Status, }, }
+ operator claim_completion$cl01 { in: { claim: Claim, }, out: None, }
+ operator closing_due_check$cd01 { in: { task: Task, }, out: { stop: StopCondition, }, }
+ operator constraint_touch_gate$ch01 { in: { action: Action, }, out: { status: Status, }, }
+ operator edit_action$ea01 { in: { action: Action, }, out: None, }
+ operator evidence_age_gate$eg01 { in: { claim: Claim, }, out: { evidence: Evidence, }, }
+ operator execute_action$xa01 { in: { action: Action, }, out: None, }
+ operator forbidden_substitute_gate$gs01 { in: { target: Target, }, out: { status: Status, }, }
+ operator fresh_evidence_gate$fg02 { in: { claim: Claim, }, out: { evidence: Evidence, }, }
+ operator inspect_existing_source$ix01 { in: { symbol: DeferredSymbol, }, out: { referent: Referent, }, }
+ operator live_runtime_check$lr01 { in: { surface: ArtifactSurface, }, out: { evidence: Evidence, }, }
+ operator lookup_action$lk01 { in: { symbol: DeferredSymbol, }, out: { referent: Referent, }, }
+ operator promote_requirement$pm03 { in: { evidence: Evidence, }, out: { requirement: Requirement, }, }
+ operator proposed_action$pr01 { in: { target: Target, }, out: { action: Action, }, }
+ operator provenance_chain_gate$pg01 { in: { claim: Claim, }, out: { provenance: Provenance, }, }
+ operator referent_first_gate$rf01 { in: { target: Target, }, out: { referent: Referent, }, }
+ operator source_read_this_turn$sr02 { in: { source: Source, }, out: { evidence: Evidence, }, }
+ operator stop_commit_gate$sg01 { in: { task: Task, }, out: { stop: StopCondition, }, }
+ operator user_verbatim_anchor_gate$va04 { in: { evidence: Evidence, }, out: { status: Status, }, }
+ operator verify_operator$vo01 { in: { evidence: Evidence, }, out: { status: Status, }, }
+}
+registers {}
+streams {}
+types { Action, ArtifactState, ArtifactSurface, Blocker, Check, Claim, CompetencyQuestion, ConstraintSet, Corpus, CorpusCase, DeferredSymbol, Evidence, EvidenceRequirement, EvidenceRisk, FailureMode, ForbiddenSet, ForbiddenSubstitute, GraphGeneration, Hypothesis, Interpretation, Intervention, NodeClass, Provenance, Proxy, Referent, RejectedExpansion, RepairSignal, Requirement, RequirementSet, ResearchSource, Risk, Root, Source, Specification, Status, StopCondition, SubstitutionClass, Substitute, Target, Task, TaskFamily, Thesis, ValidationLayer, VerificationTail, }
+end🪢
