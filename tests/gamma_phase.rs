@@ -1,8 +1,9 @@
 use serde::Deserialize;
 
 use resonance::{
-    run_beta_text, run_gamma_text, run_gamma_text_with_config, AlphaProbeCache, GammaConfig,
-    GammaFailureMode, GammaFailureModeDisposition, GammaLatentAxisStability,
+    load_public_fixtures, run_beta_text, run_gamma_text, run_gamma_text_with_config,
+    AlphaProbeCache, GammaConfig, GammaFailureMode, GammaFailureModeDisposition,
+    GammaLatentAxisStability, GammaPriorAlignment, GammaPriorSource,
 };
 
 const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
@@ -68,6 +69,8 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
     assert!(gamma.latent_sweeps.axes.is_empty());
     assert!(gamma.probe_validity.extensions_disabled);
     assert!(gamma.probe_validity.axes.is_empty());
+    assert!(gamma.prior_ensemble.extensions_disabled);
+    assert!(gamma.prior_ensemble.priors.is_empty());
     assert_eq!(gamma.beta.gain.vector, beta.gain.vector);
     assert_eq!(gamma.beta.walk.state_after, beta.walk.state_after);
     assert_eq!(gamma.beta.disagreement.probe_disagreement, beta.disagreement.probe_disagreement,);
@@ -76,6 +79,63 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
         beta.disagreement.receptor_projection_disagreement,
     );
     assert_eq!(gamma.beta.report.snap_text, beta.report.snap_text);
+}
+
+#[test]
+fn gamma_prior_ensemble_marks_each_prior_aligned_or_blocked() {
+    let fixtures = load_public_fixtures().expect("beta public fixtures should load");
+    let mut gamma_cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text_with_config(
+        &mut gamma_cache,
+        "artifact://gamma/text/prior-ensemble",
+        "A bright mechanical corridor and warm reflective accents hold the scene in tension.",
+        GammaConfig {
+            extensions_disabled: false,
+        },
+    )
+    .expect("gamma run should succeed");
+
+    assert!(!gamma.prior_ensemble.extensions_disabled);
+
+    let aligned = gamma
+        .prior_ensemble
+        .priors
+        .iter()
+        .filter(|prior| prior.alignment == GammaPriorAlignment::CoordinateAligned)
+        .collect::<Vec<_>>();
+    assert_eq!(aligned.len(), fixtures.priors.len());
+    assert!(aligned.iter().all(|prior| prior.source == GammaPriorSource::ReceptorMaps));
+    assert!(aligned
+        .iter()
+        .all(|prior| prior.atlas_id.as_deref() == Some(fixtures.atlas.id.as_str())));
+    assert!(aligned.iter().all(|prior| prior.transform_id.is_some()));
+
+    for fixture_prior in &fixtures.priors {
+        assert!(aligned.iter().any(|prior| prior.prior_id == fixture_prior.id));
+    }
+
+    let blocked = gamma
+        .prior_ensemble
+        .priors
+        .iter()
+        .filter(|prior| prior.alignment == GammaPriorAlignment::Blocked)
+        .collect::<Vec<_>>();
+    assert_eq!(blocked.len(), 4);
+
+    for source in [
+        GammaPriorSource::FunctionalGradients,
+        GammaPriorSource::StructuralConnectivity,
+        GammaPriorSource::VisualBenchmarkPriors,
+        GammaPriorSource::ImageryPriors,
+    ] {
+        let blocked_prior = blocked
+            .iter()
+            .find(|prior| prior.source == source)
+            .expect("blocked prior source should exist");
+        assert!(blocked_prior.required_follow_up.is_some());
+        assert!(blocked_prior.atlas_id.is_none());
+        assert!(blocked_prior.transform_id.is_none());
+    }
 }
 
 #[test]

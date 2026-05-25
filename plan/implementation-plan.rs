@@ -535,8 +535,8 @@ Verified by the fixture-backed sweep test and direct branch tests for stable-lef
 ✅ G3 — Probe-Validity-Evaluator-Γ
 Verified by the gamma probe-validity evaluator and the unstable-axis promotion guard test.
 
-⚠️ G4 — Prior-Ensemble-Γ
-Planned, but multiple gamma prior sources and their coordinate/blocking checks are not implemented yet.
+✅ G4 — Prior-Ensemble-Γ
+Verified by the gamma prior-ensemble observable and the aligned-or-blocked prior test.
 
 ⚠️ G5 — Receptor-Bridge-Γ
 Planned, but ensemble comparison outputs are not implemented yet.

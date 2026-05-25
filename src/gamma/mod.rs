@@ -1,3 +1,4 @@
+mod prior;
 mod probe;
 
 use std::fmt::{Display, Formatter};
@@ -7,6 +8,10 @@ use crate::{
     beta::{run_beta_artifact, BetaRun},
 };
 
+pub use prior::{
+    run_gamma_prior_ensemble_suite, GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord,
+    GammaPriorSource,
+};
 pub use probe::{
     run_gamma_latent_sweep_suite, run_gamma_probe_suite, run_gamma_probe_validity_suite,
     GammaAxisValidityAssessment, GammaFailureMode, GammaFailureModeAssessment,
@@ -34,6 +39,7 @@ pub struct GammaRun {
     pub probe_suite: GammaProbeSuite,
     pub latent_sweeps: GammaLatentSweepSuite,
     pub probe_validity: GammaProbeValiditySuite,
+    pub prior_ensemble: GammaPriorEnsembleSuite,
     pub config: GammaConfig,
 }
 
@@ -106,12 +112,14 @@ fn run_gamma_with_config(
         run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe, &config)?;
     let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact, &config)?;
     let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps, &config)?;
+    let prior_ensemble = run_gamma_prior_ensemble_suite(&config)?;
 
     Ok(GammaRun {
         beta,
         probe_suite,
         latent_sweeps,
         probe_validity,
+        prior_ensemble,
         config,
     })
 }
