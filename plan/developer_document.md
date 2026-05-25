@@ -53,6 +53,7 @@ contracts/trace.md
 contracts/claim.md
 contracts/output.md
 plan/implementation-plan.snap
+plan/work-package-01-api.md
 ```
 
 The existing `requirements.md` is a good base and should not be decimated. It should be updated by folding in the requirement ontology / contract alignment section, not rewritten from scratch.
@@ -735,3 +736,9 @@ no fake certainty
 small files
 declarative graph-first implementation
 ```
+
+## 25. Active Execution Package
+
+Execute `plan/work-package-01-api.md` now.
+
+Do not widen scope beyond that package.

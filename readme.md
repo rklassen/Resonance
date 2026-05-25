@@ -17,6 +17,12 @@ The development is planned in three principal phases with intermediate
 observation points as defined in the implementation plan and directed graph
 encoded as a snap file. 
 
+Consider the development DAG. If you do not see any fatal flaws in it, treat it
+as locked. Rectify the other degrees of freedom in machine inference to fit
+this, not the other way around.
+
+🔒 Do not edit without explicit user instructions.
+
 ## requirements
 
 The epic goals are defined in `specification/requirements.md`
@@ -37,14 +43,28 @@ systems, the top position and functional requirements of which we do not know
 at this time. This requires humility and gnosticism about the strict runtime
 environment, and or data sets that we will be processing.
 
-Pay special attention to things that seem surprising or unusual within the 
-context. If we are stating them is hard requirements, then it's because we're 
-serious and the amplifying, the messages needed in order to get adherence that
-the inferential machine doesn't overweight priors.
+Pay special attention to things that seem surprising or unusual within the
+context. If we are stating them as hard requirements, then it is because those
+constraints are carrying real engineering weight and should not be rounded away
+by priors.
 
-Keep all files under 400 lines hard cap keep all functions attached to stateless
-struck at minimum if you already have an object defined then prefer object
-methods, but determine and immutability are principal goals for us.
+Engineering rules:
+
+1. Keep all files under a 400-line hard cap.
+2. Evaluate file length only after the language auto formatter has produced the
+   final form. For Rust, judge the file after the normal vertical formatter
+   style has been applied.
+3. Prefer vertical layout with as few elements per line as practical so fields,
+   match arms, arguments, and variants remain readable.
+4. Do not try to satisfy line caps by condensing whitespace, packing multiple
+   elements onto one line, or otherwise fighting the formatter. That is an
+   anti-pattern.
+5. Run Rust validation and executable checks in `--release` by default.
+   Formatting is the exception because `cargo fmt` does not have a release
+   mode.
+6. Keep functions attached to stateless structs at minimum. If an object is
+   already defined then prefer object methods, but determinism and immutability
+   remain principal goals.
 
 ## Important distinctions
 
