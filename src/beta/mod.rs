@@ -18,7 +18,7 @@ pub use fixtures::{
     BetaFixturePrior, BetaPublicFixtures,
 };
 pub use graph::BetaParcelGraph;
-pub use receptor::{real_receptor_gain, BetaGain};
+pub use receptor::{real_receptor_gain, BetaGain, BetaGainTerm};
 pub use trace::BetaTraceReport;
 pub use walk::{laplacian_runtime, BetaWalk};
 

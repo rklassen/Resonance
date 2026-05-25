@@ -71,6 +71,8 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
     assert!(gamma.probe_validity.axes.is_empty());
     assert!(gamma.prior_ensemble.extensions_disabled);
     assert!(gamma.prior_ensemble.priors.is_empty());
+    assert!(gamma.receptor_bridge.extensions_disabled);
+    assert!(gamma.receptor_bridge.families.is_empty());
     assert_eq!(gamma.beta.gain.vector, beta.gain.vector);
     assert_eq!(gamma.beta.walk.state_after, beta.walk.state_after);
     assert_eq!(gamma.beta.disagreement.probe_disagreement, beta.disagreement.probe_disagreement,);
@@ -79,6 +81,54 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
         beta.disagreement.receptor_projection_disagreement,
     );
     assert_eq!(gamma.beta.report.snap_text, beta.report.snap_text);
+}
+
+#[test]
+fn gamma_receptor_bridge_emits_provenanced_family_comparisons() {
+    let mut gamma_cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text_with_config(
+        &mut gamma_cache,
+        "artifact://gamma/text/receptor-bridge",
+        "A warm reflective corridor vibrates with bright motion and mechanical tension.",
+        GammaConfig {
+            extensions_disabled: false,
+        },
+    )
+    .expect("gamma run should succeed");
+
+    assert!(!gamma.receptor_bridge.extensions_disabled);
+    assert_eq!(gamma.receptor_bridge.families.len(), 3);
+
+    for family in &gamma.receptor_bridge.families {
+        assert!(!family.unsupported_family);
+        assert!(family.family.is_some());
+        assert!(family.gain_mean.is_some());
+        assert!(family.gain_variance.is_some());
+        assert!(family.source_disagreement.is_some());
+        assert!(!family.prior_ids.is_empty());
+        assert!(!family.atlas_ids.is_empty());
+        assert!(!family.transform_ids.is_empty());
+        assert!(family.required_follow_up.is_none());
+    }
+
+    assert!(
+        gamma
+            .receptor_bridge
+            .families
+            .iter()
+            .any(|family| family.family.as_deref() == Some("serotonin")
+                && family.prior_ids.len() == 2)
+    );
+    assert!(gamma
+        .receptor_bridge
+        .families
+        .iter()
+        .any(|family| family.family.as_deref() == Some("glutamate")));
+    assert!(gamma
+        .receptor_bridge
+        .families
+        .iter()
+        .any(|family| family.family.as_deref() == Some("norepinephrine")));
 }
 
 #[test]

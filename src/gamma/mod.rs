@@ -1,5 +1,6 @@
 mod prior;
 mod probe;
+mod receptor;
 
 use std::fmt::{Display, Formatter};
 
@@ -18,6 +19,9 @@ pub use probe::{
     GammaFailureModeDisposition, GammaLatentAxisStability, GammaLatentAxisSweep,
     GammaLatentAxisVariantRun, GammaLatentPromptVariant, GammaLatentSweepSuite, GammaProbeFamily,
     GammaProbeFamilyRun, GammaProbeSuite, GammaProbeValiditySuite,
+};
+pub use receptor::{
+    run_gamma_receptor_bridge_suite, GammaReceptorBridgeSuite, GammaReceptorFamilyComparison,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -40,6 +44,7 @@ pub struct GammaRun {
     pub latent_sweeps: GammaLatentSweepSuite,
     pub probe_validity: GammaProbeValiditySuite,
     pub prior_ensemble: GammaPriorEnsembleSuite,
+    pub receptor_bridge: GammaReceptorBridgeSuite,
     pub config: GammaConfig,
 }
 
@@ -113,6 +118,7 @@ fn run_gamma_with_config(
     let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact, &config)?;
     let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps, &config)?;
     let prior_ensemble = run_gamma_prior_ensemble_suite(&config)?;
+    let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain, &config)?;
 
     Ok(GammaRun {
         beta,
@@ -120,6 +126,7 @@ fn run_gamma_with_config(
         latent_sweeps,
         probe_validity,
         prior_ensemble,
+        receptor_bridge,
         config,
     })
 }

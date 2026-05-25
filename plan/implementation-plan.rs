@@ -538,8 +538,8 @@ Verified by the gamma probe-validity evaluator and the unstable-axis promotion g
 ✅ G4 — Prior-Ensemble-Γ
 Verified by the gamma prior-ensemble observable and the aligned-or-blocked prior test.
 
-⚠️ G5 — Receptor-Bridge-Γ
-Planned, but ensemble comparison outputs are not implemented yet.
+✅ G5 — Receptor-Bridge-Γ
+Verified by the gamma receptor-bridge ensemble observable and the provenanced family comparison test.
 
 ⚠️ G6 — Dual-Path-Runtime-Γ
 Planned, but objective and narrative path separation is not implemented yet.
