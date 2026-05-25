@@ -1,13 +1,15 @@
 mod narrative;
+mod objective_runtime;
 
 use sha2::{Digest, Sha256};
 
 use crate::{
-    beta::BetaRun, CapabilityId, ContractId, DeterminismPolicyId, ExecutionId, FailurePolicyId,
-    NumericPolicyId, OperatorDeclaration, OperatorExecutionRecord, OperatorId, PayloadId,
-    PayloadRecord, PhaseToken, ProbeExecutionRecord, ProvenancePolicyId, ReplayPolicyId, RunId,
-    RuntimePolicyId, SideEffectPolicyId, SnapEdgeRef, SnapNodeRef, SnapPathRef, TraceId,
-    TraceRecord, TraceStep, TraceStepId, UtcMinute, ValueRef,
+    beta::BetaRun, CapabilityId, ClaimRecord, ContractId, DeterminismPolicyId, ExecutionId,
+    FailurePolicyId, GateDeclaration, GateResult, NumericPolicyId, OperatorDeclaration,
+    OperatorExecutionRecord, OperatorId, PayloadId, PayloadRecord, PhaseToken,
+    ProbeExecutionRecord, ProvenancePolicyId, ReplayPolicyId, RunId, RuntimePolicyId,
+    SideEffectPolicyId, SnapEdgeRef, SnapNodeRef, SnapPathRef, TraceId, TraceRecord, TraceStep,
+    TraceStepId, UtcMinute, ValueRef,
 };
 
 use super::GammaError;
@@ -23,8 +25,28 @@ pub struct GammaObjectivePath {
     pub execution: OperatorExecutionRecord,
     pub payload: PayloadRecord,
     pub state_seed: Vec<f32>,
+    pub runtime: GammaObjectiveRuntime,
     pub trace: TraceRecord,
     pub steps: Vec<TraceStep>,
+    pub detail: String,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct GammaObjectiveRuntime {
+    pub declaration: OperatorDeclaration,
+    pub execution: OperatorExecutionRecord,
+    pub payload: PayloadRecord,
+    pub gate_declaration: GateDeclaration,
+    pub gate_result: GateResult,
+    pub claim: ClaimRecord,
+    pub state_before: Vec<f32>,
+    pub directed_phase_delta: Vec<f32>,
+    pub wavelet_low_band: Vec<f32>,
+    pub wavelet_high_band: Vec<f32>,
+    pub wavelet_delta: Vec<f32>,
+    pub recirculation_delta: Vec<f32>,
+    pub reduction_state_after: Vec<f32>,
+    pub state_after: Vec<f32>,
     pub detail: String,
 }
 
@@ -33,10 +55,22 @@ pub struct GammaNarrativePath {
     pub bridge_declaration: OperatorDeclaration,
     pub bridge_execution: OperatorExecutionRecord,
     pub bridge_payload: PayloadRecord,
+    pub parcel_feedback: GammaNarrativeParcelFeedback,
     pub family_names: Vec<String>,
     pub family_mean_vector: Vec<f32>,
     pub trace: TraceRecord,
     pub steps: Vec<TraceStep>,
+    pub detail: String,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct GammaNarrativeParcelFeedback {
+    pub declaration: OperatorDeclaration,
+    pub execution: OperatorExecutionRecord,
+    pub payload: PayloadRecord,
+    pub gate_declaration: GateDeclaration,
+    pub gate_result: GateResult,
+    pub vector: Vec<f32>,
     pub detail: String,
 }
 
@@ -47,13 +81,18 @@ pub struct GammaDualPathRuntime {
 }
 
 pub fn run_gamma_dual_path_runtime(beta: &BetaRun) -> Result<GammaDualPathRuntime, GammaError> {
+    let narrative_path = narrative::build_narrative_path(beta)?;
+
     Ok(GammaDualPathRuntime {
-        objective_path: build_objective_path(beta)?,
-        narrative_path: narrative::build_narrative_path(beta)?,
+        objective_path: build_objective_path(beta, &narrative_path)?,
+        narrative_path,
     })
 }
 
-fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError> {
+fn build_objective_path(
+    beta: &BetaRun,
+    narrative_path: &GammaNarrativePath,
+) -> Result<GammaObjectivePath, GammaError> {
     let state_seed = build_objective_state_seed(beta);
     if state_seed.len() != beta.graph.node_count {
         return Err(GammaError::new("gamma objective path must match beta parcel graph width"));
@@ -68,11 +107,11 @@ fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError
         beta.graph.hemisphere.join("|").as_bytes(),
     ]);
     let graph_declaration = OperatorDeclaration {
-        id: OperatorId("operator-gamma-objective-graph-substrate".into()),
-        name: "gamma-objective-graph-substrate".into(),
-        inputs: vec![ContractId("contract.graph.beta-360".into())],
-        outputs: vec![ContractId("contract.payload.gamma.objective-graph-360".into())],
-        capabilities: vec![CapabilityId("capability.gamma-objective-graph-substrate".into())],
+        id: OperatorId("operator-gamma-objective-beta-graph-source".into()),
+        name: "gamma-objective-beta-graph-source".into(),
+        inputs: Vec::new(),
+        outputs: vec![ContractId("contract.graph.beta-360".into())],
+        capabilities: vec![CapabilityId("capability.gamma-objective-beta-graph-source".into())],
         runtime: RuntimePolicyId("runtime.gamma.replayable".into()),
         determinism: DeterminismPolicyId("determinism.replayable".into()),
         side_effects: SideEffectPolicyId("side-effect.write-trace".into()),
@@ -95,11 +134,11 @@ fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError
     };
     let graph_payload = PayloadRecord {
         id: graph_execution.output_payloads[0].clone(),
-        contract: ContractId("contract.payload.gamma.objective-graph-360".into()),
+        contract: ContractId("contract.graph.beta-360".into()),
         producer: graph_execution.id.clone(),
         source_artifacts: Vec::new(),
         source_payloads: Vec::new(),
-        value: ValueRef("inline://gamma/objective/graph-360".into()),
+        value: ValueRef("inline://beta/graph/360".into()),
         hash: Some(crate::HashDigest {
             algorithm: "sha256".into(),
             digest_hex: graph_digest,
@@ -158,7 +197,7 @@ fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError
         phase: Some(PhaseToken(GAMMA_PHASE.into())),
         created: UtcMinute(202605250201),
     };
-    let trace = TraceRecord {
+    let mut trace = TraceRecord {
         id: TraceId(format!("trace-gamma-objective-{}", beta.artifact.record.id.0)),
         run: RunId(format!("run-gamma-{}", beta.artifact.record.id.0)),
         phase: Some(PhaseToken(GAMMA_PHASE.into())),
@@ -182,7 +221,7 @@ fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError
         replay: ReplayPolicyId("replay.canonical".into()),
         created: UtcMinute(202605250201),
     };
-    let steps = vec![
+    let mut steps = vec![
         trace_step(
             "trace-step-gamma-objective-intake",
             &trace.id,
@@ -219,6 +258,36 @@ fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError
             vec![SnapEdgeRef("flow:g604->g605".into())],
         ),
     ];
+    let (runtime, runtime_step) = objective_runtime::build_objective_runtime(
+        beta,
+        &state_seed,
+        &graph_payload,
+        &payload,
+        &narrative_path.parcel_feedback,
+        &trace.id,
+    )?;
+    trace.operator_executions.push(narrative_path.bridge_execution.id.clone());
+    trace
+        .operator_executions
+        .push(narrative_path.parcel_feedback.execution.id.clone());
+    trace.operator_executions.push(runtime.execution.id.clone());
+    trace.payloads.push(narrative_path.bridge_payload.id.clone());
+    trace
+        .payloads
+        .push(narrative_path.parcel_feedback.payload.id.clone());
+    trace.payloads.push(beta.gain.payload.id.clone());
+    trace.payloads.push(beta.walk.payload.id.clone());
+    trace.payloads.push(runtime.payload.id.clone());
+    trace.gate_results.push(runtime.gate_result.gate_result_id.clone());
+    trace.claims.push(runtime.claim.id.clone());
+    steps.push(trace_step(
+        "trace-step-gamma-objective-narrative-feedback",
+        &trace.id,
+        &narrative_path.parcel_feedback.execution,
+        vec![SnapNodeRef("g616".into()), SnapNodeRef("g617".into())],
+        vec![SnapEdgeRef("flow:g616->g617".into())],
+    ));
+    steps.push(runtime_step);
 
     Ok(GammaObjectivePath {
         graph_declaration,
@@ -228,6 +297,7 @@ fn build_objective_path(beta: &BetaRun) -> Result<GammaObjectivePath, GammaError
         execution,
         payload,
         state_seed,
+        runtime,
         trace,
         steps,
         detail: format!(

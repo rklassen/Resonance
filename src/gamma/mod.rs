@@ -26,6 +26,7 @@ pub use receptor::{
 };
 pub use runtime::{
     run_gamma_dual_path_runtime, GammaDualPathRuntime, GammaNarrativePath, GammaObjectivePath,
+    GammaObjectiveRuntime,
 };
 
 #[derive(Clone, Debug, PartialEq)]

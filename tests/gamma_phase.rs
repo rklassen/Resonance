@@ -3,6 +3,7 @@ use serde::Deserialize;
 use resonance::{
     load_public_fixtures, run_beta_text, run_gamma_text, AlphaProbeCache, GammaFailureMode,
     GammaFailureModeDisposition, GammaLatentAxisStability, GammaPriorAlignment, GammaPriorSource,
+    GateDecision,
 };
 
 const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
@@ -138,24 +139,97 @@ fn gamma_dual_path_runtime_emits_independent_path_traces_before_comparison() {
     let narrative = &gamma.dual_path_runtime.narrative_path;
 
     assert_eq!(objective.state_seed.len(), gamma.beta.graph.node_count);
+    assert_eq!(objective.runtime.state_before, gamma.beta.walk.state_before);
     assert!(objective.trace.operator_executions.contains(&objective.execution.id));
     assert!(objective.trace.operator_executions.contains(&objective.graph_execution.id));
+    assert!(objective.trace.operator_executions.contains(&narrative.bridge_execution.id));
+    assert!(objective.trace.operator_executions.contains(&narrative.parcel_feedback.execution.id));
+    assert!(objective.trace.operator_executions.contains(&objective.runtime.execution.id));
     assert!(objective.trace.payloads.contains(&objective.graph_payload.id));
     assert!(objective.trace.payloads.contains(&objective.payload.id));
+    assert!(objective.trace.payloads.contains(&narrative.bridge_payload.id));
+    assert!(objective.trace.payloads.contains(&narrative.parcel_feedback.payload.id));
+    assert!(objective.trace.payloads.contains(&objective.runtime.payload.id));
     assert!(objective.trace.payloads.contains(&gamma.beta.embedding_probe.payload.id));
-    assert!(objective.trace.gate_results.is_empty());
+    assert!(objective.trace.payloads.contains(&gamma.beta.walk.payload.id));
+    assert!(objective.trace.payloads.contains(&gamma.beta.gain.payload.id));
+    assert_eq!(
+        objective.trace.gate_results,
+        vec![objective.runtime.gate_result.gate_result_id.clone()]
+    );
+    assert_eq!(objective.trace.claims, vec![objective.runtime.claim.id.clone()]);
+    assert_eq!(objective.runtime.gate_result.decision, GateDecision::Pass);
 
     assert!(narrative.trace.payloads.contains(&gamma.beta.label_probe.payload.id));
     assert!(narrative.trace.payloads.contains(&gamma.beta.vibes.payload_12d.id));
     assert!(narrative.trace.payloads.contains(&gamma.beta.vibes.payload_11d.id));
     assert!(narrative.trace.payloads.contains(&gamma.beta.gain.payload.id));
     assert!(narrative.trace.payloads.contains(&narrative.bridge_payload.id));
+    assert!(narrative.trace.payloads.contains(&narrative.parcel_feedback.payload.id));
+    assert_eq!(
+        narrative.trace.gate_results,
+        vec![narrative.parcel_feedback.gate_result.gate_result_id.clone()]
+    );
     assert_eq!(narrative.bridge_execution.input_payloads, vec![gamma.beta.gain.payload.id.clone()]);
+    assert_eq!(narrative.parcel_feedback.vector.len(), gamma.beta.graph.node_count);
+    assert_eq!(narrative.parcel_feedback.gate_result.decision, GateDecision::Pass);
+    assert_eq!(
+        narrative.parcel_feedback.execution.input_payloads,
+        vec![narrative.bridge_payload.id.clone(), gamma.beta.gain.payload.id.clone()]
+    );
     assert_eq!(narrative.family_names.len(), narrative.family_mean_vector.len());
     assert!(!narrative.family_names.is_empty());
 
     assert_ne!(objective.trace.id, narrative.trace.id);
-    assert!(narrative.trace.gate_results.is_empty());
+    assert_eq!(
+        narrative.trace.gate_results,
+        vec![narrative.parcel_feedback.gate_result.gate_result_id.clone()]
+    );
+}
+
+#[test]
+fn gamma_objective_runtime_reduces_to_beta_laplacian_runtime_when_phase_terms_are_zero() {
+    let mut gamma_cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text(
+        &mut gamma_cache,
+        "artifact://gamma/text/objective-runtime",
+        "A bright corridor holds reflective warmth while a tense pulse repeats through the scene.",
+    )
+    .expect("gamma run should succeed");
+
+    let runtime = &gamma.dual_path_runtime.objective_path.runtime;
+
+    assert_eq!(runtime.reduction_state_after, gamma.beta.walk.state_after);
+    assert_eq!(runtime.gate_result.decision, GateDecision::Pass);
+    assert_eq!(
+        runtime.claim.support_gate_results,
+        vec![runtime.gate_result.gate_result_id.clone()]
+    );
+}
+
+#[test]
+fn gamma_objective_runtime_emits_g7_terms_on_the_live_path() {
+    let mut gamma_cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text(
+        &mut gamma_cache,
+        "artifact://gamma/text/g7-runtime",
+        "Reflective glass and warm metals keep the corridor bright while a tense narrative current folds back through the scene.",
+    )
+    .expect("gamma run should succeed");
+
+    let runtime = &gamma.dual_path_runtime.objective_path.runtime;
+
+    assert_eq!(runtime.wavelet_low_band, gamma.beta.walk.laplacian_delta);
+    assert!(runtime.wavelet_high_band.iter().any(|value| value.abs() > f32::EPSILON));
+    assert!(runtime.directed_phase_delta.iter().any(|value| value.abs() > f32::EPSILON));
+    assert!(runtime.recirculation_delta.iter().any(|value| value.abs() > f32::EPSILON));
+    assert_ne!(runtime.wavelet_delta, runtime.wavelet_low_band);
+    assert_ne!(runtime.state_after, gamma.beta.walk.state_after);
+    assert_eq!(runtime.execution.input_payloads.len(), 5);
+    assert!(runtime
+        .execution
+        .input_payloads
+        .contains(&gamma.dual_path_runtime.narrative_path.parcel_feedback.payload.id));
 }
 
 #[test]

@@ -69,8 +69,8 @@ Verified by the gamma receptor-bridge ensemble observable and the provenanced fa
 ✅ G6 — Dual-Path-Runtime-Γ
 Verified by `run_gamma_dual_path_runtime()` and the independent path-trace test.
 
-⚠️ G7 — Magnetic-Wavelet-Runtime-Γ
-Planned, but phase/wavelet runtime extensions and the beta-reduction invariant are not implemented yet.
+✅ G7 — Magnetic-Wavelet-Runtime-Γ
+Verified by the directed-phase, wavelet, and recirculation runtime implementation plus the live-path and beta-reduction gamma phase tests.
 
 ⚠️ G8 — Cross-Projection-Readout-Γ
 Planned, but cross-projection disagreement localization is not implemented yet.
@@ -86,7 +86,7 @@ Current execution order
 
 Current active milestone
 
-The next work package is `G7 — Magnetic-Wavelet-Runtime-Γ` in
+The next work package is `G8 — Cross-Projection-Readout-Γ` in
 `implementation-plan-gamma.rs`.
 
 `#end resonance/implementation-plan.md`
