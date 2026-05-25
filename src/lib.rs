@@ -1,6 +1,8 @@
 pub mod alpha;
 pub mod artifact;
+pub mod beta;
 pub mod claim;
+pub mod gamma;
 pub mod gate;
 pub mod ids;
 pub mod operator;
@@ -13,7 +15,9 @@ pub mod trace;
 
 pub use alpha::*;
 pub use artifact::*;
+pub use beta::*;
 pub use claim::*;
+pub use gamma::*;
 pub use gate::*;
 pub use ids::*;
 pub use operator::*;

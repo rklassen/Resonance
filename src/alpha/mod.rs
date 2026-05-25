@@ -14,7 +14,9 @@ use std::fmt::{Display, Formatter};
 pub use artifact::{hash_artifact, load_image, load_text, normalize_metadata, AlphaArtifact};
 pub use cache::{AlphaCacheKey, AlphaProbeCache, CacheLookup, CacheStatus};
 pub use graph::AlphaParcelGraph;
-pub use probe::{run_embedding_probe, run_label_probe, AlphaProbeRun};
+pub use probe::{
+    run_configured_probe, run_embedding_probe, run_label_probe, AlphaProbeRun, ProbeRecipe,
+};
 pub use receptor::{mock_receptor_gain, AlphaGain, PARCEL_COUNT};
 pub use snap::{
     AlphaSnapDocument, AlphaSnapEdgeGroup, AlphaSnapNode, AlphaSnapRegister, AlphaSnapType,

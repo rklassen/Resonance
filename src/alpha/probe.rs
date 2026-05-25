@@ -22,6 +22,18 @@ pub struct AlphaProbeRun {
     pub values: Vec<f32>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ProbeRecipe {
+    pub probe_id: String,
+    pub name: String,
+    pub model_id: String,
+    pub prompt_id: String,
+    pub output_contract: String,
+    pub capability: String,
+    pub output_len: usize,
+    pub created: UtcMinute,
+}
+
 pub fn run_embedding_probe(cache: &mut AlphaProbeCache, artifact: &AlphaArtifact) -> AlphaProbeRun {
     run_probe(
         cache,
@@ -56,10 +68,18 @@ pub fn run_label_probe(cache: &mut AlphaProbeCache, artifact: &AlphaArtifact) ->
     )
 }
 
+pub fn run_configured_probe(
+    cache: &mut AlphaProbeCache,
+    artifact: &AlphaArtifact,
+    recipe: ProbeRecipe,
+) -> AlphaProbeRun {
+    run_probe(cache, artifact, recipe)
+}
+
 fn run_probe(
     cache: &mut AlphaProbeCache,
     artifact: &AlphaArtifact,
-    spec: ProbeSpec,
+    spec: ProbeRecipe,
 ) -> AlphaProbeRun {
     let declaration = build_declaration(&spec);
     let key = AlphaCacheKey {
@@ -196,7 +216,7 @@ fn hash_string(value: &str) -> HashDigest {
     }
 }
 
-fn build_declaration(spec: &ProbeSpec) -> ProbeDeclaration {
+fn build_declaration(spec: &ProbeRecipe) -> ProbeDeclaration {
     ProbeDeclaration {
         id: ProbeId(spec.probe_id.clone()),
         name: spec.name.clone(),
@@ -218,18 +238,6 @@ fn build_declaration(spec: &ProbeSpec) -> ProbeDeclaration {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-struct ProbeSpec {
-    probe_id: String,
-    name: String,
-    model_id: String,
-    prompt_id: String,
-    output_contract: String,
-    capability: String,
-    output_len: usize,
-    created: UtcMinute,
-}
-
 fn probe_spec(
     probe_id: &str,
     name: &str,
@@ -239,8 +247,8 @@ fn probe_spec(
     capability: &str,
     output_len: usize,
     created: UtcMinute,
-) -> ProbeSpec {
-    ProbeSpec {
+) -> ProbeRecipe {
+    ProbeRecipe {
         probe_id: probe_id.into(),
         name: name.into(),
         model_id: model_id.into(),
