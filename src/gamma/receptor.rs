@@ -3,8 +3,7 @@ use std::collections::BTreeMap;
 use crate::beta::{BetaGain, BetaGainTerm};
 
 use super::{
-    GammaConfig, GammaError, GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord,
-    GammaPriorSource,
+    GammaError, GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord, GammaPriorSource,
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -24,21 +23,12 @@ pub struct GammaReceptorFamilyComparison {
 #[derive(Clone, Debug, PartialEq)]
 pub struct GammaReceptorBridgeSuite {
     pub families: Vec<GammaReceptorFamilyComparison>,
-    pub extensions_disabled: bool,
 }
 
 pub fn run_gamma_receptor_bridge_suite(
     prior_ensemble: &GammaPriorEnsembleSuite,
     gain: &BetaGain,
-    config: &GammaConfig,
 ) -> Result<GammaReceptorBridgeSuite, GammaError> {
-    if config.extensions_disabled {
-        return Ok(GammaReceptorBridgeSuite {
-            families: Vec::new(),
-            extensions_disabled: true,
-        });
-    }
-
     let aligned_priors = prior_ensemble
         .priors
         .iter()
@@ -53,7 +43,6 @@ pub fn run_gamma_receptor_bridge_suite(
 
     Ok(GammaReceptorBridgeSuite {
         families,
-        extensions_disabled: false,
     })
 }
 
@@ -112,30 +101,51 @@ fn supported_family_comparison(
         })
         .sum::<f32>()
         / coefficients.len() as f32;
-    let min = coefficients.iter().copied().fold(f32::INFINITY, f32::min);
-    let max = coefficients.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+    let source_means =
+        entries.iter().fold(BTreeMap::<String, Vec<f32>>::new(), |mut grouped, (term, prior)| {
+            let source_record =
+                prior.source_record.clone().unwrap_or_else(|| term.prior_id.clone());
+            grouped.entry(source_record).or_default().push(term.coefficient);
+            grouped
+        });
+    let source_disagreement = if source_means.len() > 1 {
+        let source_values = source_means
+            .values()
+            .map(|values| values.iter().sum::<f32>() / values.len() as f32)
+            .collect::<Vec<_>>();
+        let min = source_values.iter().copied().fold(f32::INFINITY, f32::min);
+        let max = source_values.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+        Some(max - min)
+    } else {
+        None
+    };
     let prior_ids = entries.iter().map(|(term, _)| term.prior_id.clone()).collect::<Vec<_>>();
     let atlas_ids =
         entries.iter().filter_map(|(_, prior)| prior.atlas_id.clone()).collect::<Vec<_>>();
     let transform_ids =
         entries.iter().filter_map(|(_, prior)| prior.transform_id.clone()).collect::<Vec<_>>();
+    let source_count = source_means.len();
+    let disagreement_detail = match source_disagreement {
+        Some(disagreement) => format!("source disagreement {:.6} across {} aligned source record(s)", disagreement, source_count),
+        None => format!("source disagreement unavailable because receptor family {} has {} aligned source record(s)", family, source_count),
+    };
 
     GammaReceptorFamilyComparison {
         family: Some(family.into()),
         gain_mean: Some(gain_mean),
         gain_variance: Some(gain_variance),
-        source_disagreement: Some(max - min),
+        source_disagreement,
         unsupported_family: false,
         prior_ids,
         atlas_ids,
         transform_ids,
         detail: format!(
-            "receptor family {} compares {} aligned prior source(s) with mean {:+.6}, variance {:.6}, disagreement {:.6}",
+            "receptor family {} compares {} aligned prior record(s) with mean {:+.6}, variance {:.6}; {}",
             family,
             entries.len(),
             gain_mean,
             gain_variance,
-            max - min,
+            disagreement_detail,
         ),
         required_follow_up: None,
     }
@@ -170,6 +180,7 @@ mod tests {
         let aligned_priors = vec![GammaPriorRecord {
             source: GammaPriorSource::ReceptorMaps,
             prior_id: "prior-unsupported".into(),
+            source_record: Some("demo-source".into()),
             alignment: GammaPriorAlignment::CoordinateAligned,
             atlas_id: Some("atlas-demo".into()),
             transform_id: Some("transform-demo".into()),

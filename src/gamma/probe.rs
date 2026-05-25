@@ -2,7 +2,7 @@ use crate::alpha::{
     run_configured_probe, AlphaArtifact, AlphaProbeCache, AlphaProbeRun, ProbeRecipe,
 };
 
-use super::{GammaConfig, GammaError};
+use super::GammaError;
 
 const LATENT_AXIS_MODEL_ID: &str = "model.gamma.latent-axis.v1";
 const LATENT_AXIS_OUTPUT_CONTRACT: &str = "contract.payload.gamma.latent-axis";
@@ -30,7 +30,6 @@ pub struct GammaProbeFamilyRun {
 #[derive(Clone, Debug, PartialEq)]
 pub struct GammaProbeSuite {
     pub families: Vec<GammaProbeFamilyRun>,
-    pub extensions_disabled: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -70,7 +69,6 @@ pub struct GammaLatentAxisSweep {
 #[derive(Clone, Debug, PartialEq)]
 pub struct GammaLatentSweepSuite {
     pub axes: Vec<GammaLatentAxisSweep>,
-    pub extensions_disabled: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -107,7 +105,6 @@ pub struct GammaAxisValidityAssessment {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GammaProbeValiditySuite {
     pub axes: Vec<GammaAxisValidityAssessment>,
-    pub extensions_disabled: bool,
 }
 
 struct GammaLatentAxisSpec {
@@ -121,7 +118,6 @@ pub fn run_gamma_probe_suite(
     artifact: &AlphaArtifact,
     core_embedding: &AlphaProbeRun,
     core_affect: &AlphaProbeRun,
-    config: &GammaConfig,
 ) -> Result<GammaProbeSuite, GammaError> {
     let mut families = vec![
         GammaProbeFamilyRun {
@@ -162,22 +158,13 @@ pub fn run_gamma_probe_suite(
 
     Ok(GammaProbeSuite {
         families,
-        extensions_disabled: config.extensions_disabled,
     })
 }
 
 pub fn run_gamma_latent_sweep_suite(
     cache: &mut AlphaProbeCache,
     artifact: &AlphaArtifact,
-    config: &GammaConfig,
 ) -> Result<GammaLatentSweepSuite, GammaError> {
-    if config.extensions_disabled {
-        return Ok(GammaLatentSweepSuite {
-            axes: Vec::new(),
-            extensions_disabled: true,
-        });
-    }
-
     let mut axes = Vec::new();
     for axis in latent_axis_specs() {
         let variants = latent_prompt_variants()
@@ -229,21 +216,12 @@ pub fn run_gamma_latent_sweep_suite(
 
     Ok(GammaLatentSweepSuite {
         axes,
-        extensions_disabled: false,
     })
 }
 
 pub fn run_gamma_probe_validity_suite(
     latent_sweeps: &GammaLatentSweepSuite,
-    config: &GammaConfig,
 ) -> Result<GammaProbeValiditySuite, GammaError> {
-    if config.extensions_disabled {
-        return Ok(GammaProbeValiditySuite {
-            axes: Vec::new(),
-            extensions_disabled: true,
-        });
-    }
-
     let axes = latent_sweeps
         .axes
         .iter()
@@ -289,7 +267,6 @@ pub fn run_gamma_probe_validity_suite(
 
     Ok(GammaProbeValiditySuite {
         axes,
-        extensions_disabled: false,
     })
 }
 

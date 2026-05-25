@@ -1,9 +1,8 @@
 use serde::Deserialize;
 
 use resonance::{
-    load_public_fixtures, run_beta_text, run_gamma_text, run_gamma_text_with_config,
-    AlphaProbeCache, GammaConfig, GammaFailureMode, GammaFailureModeDisposition,
-    GammaLatentAxisStability, GammaPriorAlignment, GammaPriorSource,
+    load_public_fixtures, run_beta_text, run_gamma_text, AlphaProbeCache, GammaFailureMode,
+    GammaFailureModeDisposition, GammaLatentAxisStability, GammaPriorAlignment, GammaPriorSource,
 };
 
 const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
@@ -13,7 +12,6 @@ const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
 struct GammaLatentSweepFixture {
     source: String,
     text: String,
-    extensions_disabled: bool,
     axes: Vec<GammaLatentAxisFixture>,
 }
 
@@ -39,7 +37,7 @@ struct GammaLatentVariantFixture {
 }
 
 #[test]
-fn gamma_reduces_to_beta_when_extensions_disabled() {
+fn gamma_preserves_beta_substrate_while_extending_gamma_surfaces() {
     let mut beta_cache = AlphaProbeCache::default();
     let beta = run_beta_text(
         &mut beta_cache,
@@ -55,7 +53,6 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
     )
     .expect("gamma run should succeed");
 
-    assert!(gamma.config.extensions_disabled);
     assert_eq!(gamma.probe_suite.families.len(), 6);
     assert_eq!(gamma.probe_suite.families[0].family.name, "visual-semantic");
     assert_eq!(gamma.probe_suite.families[1].family.name, "affect-emotion");
@@ -65,14 +62,10 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
         .families
         .iter()
         .all(|family| !family.family.output_contract.is_empty()));
-    assert!(gamma.latent_sweeps.extensions_disabled);
-    assert!(gamma.latent_sweeps.axes.is_empty());
-    assert!(gamma.probe_validity.extensions_disabled);
-    assert!(gamma.probe_validity.axes.is_empty());
-    assert!(gamma.prior_ensemble.extensions_disabled);
-    assert!(gamma.prior_ensemble.priors.is_empty());
-    assert!(gamma.receptor_bridge.extensions_disabled);
-    assert!(gamma.receptor_bridge.families.is_empty());
+    assert_eq!(gamma.latent_sweeps.axes.len(), 6);
+    assert_eq!(gamma.probe_validity.axes.len(), gamma.latent_sweeps.axes.len());
+    assert!(!gamma.prior_ensemble.priors.is_empty());
+    assert!(!gamma.receptor_bridge.families.is_empty());
     assert_eq!(gamma.beta.gain.vector, beta.gain.vector);
     assert_eq!(gamma.beta.walk.state_after, beta.walk.state_after);
     assert_eq!(gamma.beta.disagreement.probe_disagreement, beta.disagreement.probe_disagreement,);
@@ -86,39 +79,39 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
 #[test]
 fn gamma_receptor_bridge_emits_provenanced_family_comparisons() {
     let mut gamma_cache = AlphaProbeCache::default();
-    let gamma = run_gamma_text_with_config(
+    let gamma = run_gamma_text(
         &mut gamma_cache,
         "artifact://gamma/text/receptor-bridge",
         "A warm reflective corridor vibrates with bright motion and mechanical tension.",
-        GammaConfig {
-            extensions_disabled: false,
-        },
     )
     .expect("gamma run should succeed");
 
-    assert!(!gamma.receptor_bridge.extensions_disabled);
-    assert_eq!(gamma.receptor_bridge.families.len(), 3);
+    assert!(gamma.receptor_bridge.families.len() >= 3);
 
     for family in &gamma.receptor_bridge.families {
-        assert!(!family.unsupported_family);
-        assert!(family.family.is_some());
-        assert!(family.gain_mean.is_some());
-        assert!(family.gain_variance.is_some());
-        assert!(family.source_disagreement.is_some());
         assert!(!family.prior_ids.is_empty());
         assert!(!family.atlas_ids.is_empty());
         assert!(!family.transform_ids.is_empty());
-        assert!(family.required_follow_up.is_none());
+        if family.unsupported_family {
+            assert!(family.family.is_none());
+            assert!(family.gain_mean.is_none());
+            assert!(family.gain_variance.is_none());
+            assert!(family.required_follow_up.is_some());
+        } else {
+            assert!(family.family.is_some());
+            assert!(family.gain_mean.is_some());
+            assert!(family.gain_variance.is_some());
+            assert!(family.required_follow_up.is_none());
+        }
     }
 
-    assert!(
-        gamma
-            .receptor_bridge
-            .families
-            .iter()
-            .any(|family| family.family.as_deref() == Some("serotonin")
-                && family.prior_ids.len() == 2)
-    );
+    assert!(gamma
+        .receptor_bridge
+        .families
+        .iter()
+        .any(|family| family.family.as_deref() == Some("serotonin")
+            && family.prior_ids.len() == 2
+            && family.source_disagreement.is_none()));
     assert!(gamma
         .receptor_bridge
         .families
@@ -135,17 +128,12 @@ fn gamma_receptor_bridge_emits_provenanced_family_comparisons() {
 fn gamma_prior_ensemble_marks_each_prior_aligned_or_blocked() {
     let fixtures = load_public_fixtures().expect("beta public fixtures should load");
     let mut gamma_cache = AlphaProbeCache::default();
-    let gamma = run_gamma_text_with_config(
+    let gamma = run_gamma_text(
         &mut gamma_cache,
         "artifact://gamma/text/prior-ensemble",
         "A bright mechanical corridor and warm reflective accents hold the scene in tension.",
-        GammaConfig {
-            extensions_disabled: false,
-        },
     )
     .expect("gamma run should succeed");
-
-    assert!(!gamma.prior_ensemble.extensions_disabled);
 
     let aligned = gamma
         .prior_ensemble
@@ -155,6 +143,7 @@ fn gamma_prior_ensemble_marks_each_prior_aligned_or_blocked() {
         .collect::<Vec<_>>();
     assert_eq!(aligned.len(), fixtures.priors.len());
     assert!(aligned.iter().all(|prior| prior.source == GammaPriorSource::ReceptorMaps));
+    assert!(aligned.iter().all(|prior| prior.source_record.is_some()));
     assert!(aligned
         .iter()
         .all(|prior| prior.atlas_id.as_deref() == Some(fixtures.atlas.id.as_str())));
@@ -193,19 +182,9 @@ fn gamma_latent_axis_sweeps_mark_stability_per_axis() {
     let fixture = serde_json::from_str::<GammaLatentSweepFixture>(G2_LATENT_SWEEP_FIXTURE_JSON)
         .expect("gamma G2 latent sweep fixture should parse");
     let mut gamma_cache = AlphaProbeCache::default();
-    let gamma = run_gamma_text_with_config(
-        &mut gamma_cache,
-        &fixture.source,
-        &fixture.text,
-        GammaConfig {
-            extensions_disabled: false,
-        },
-    )
-    .expect("gamma run should succeed");
+    let gamma = run_gamma_text(&mut gamma_cache, &fixture.source, &fixture.text)
+        .expect("gamma run should succeed");
 
-    assert!(!gamma.config.extensions_disabled);
-    assert_eq!(gamma.latent_sweeps.extensions_disabled, fixture.extensions_disabled);
-    assert!(!gamma.latent_sweeps.extensions_disabled);
     assert_eq!(gamma.latent_sweeps.axes.len(), fixture.axes.len());
 
     for (axis, expected_axis) in gamma.latent_sweeps.axes.iter().zip(fixture.axes.iter()) {
@@ -268,17 +247,9 @@ fn gamma_probe_validity_blocks_unstable_axis_promotion() {
     let fixture = serde_json::from_str::<GammaLatentSweepFixture>(G2_LATENT_SWEEP_FIXTURE_JSON)
         .expect("gamma G2 latent sweep fixture should parse");
     let mut gamma_cache = AlphaProbeCache::default();
-    let gamma = run_gamma_text_with_config(
-        &mut gamma_cache,
-        &fixture.source,
-        &fixture.text,
-        GammaConfig {
-            extensions_disabled: false,
-        },
-    )
-    .expect("gamma run should succeed");
+    let gamma = run_gamma_text(&mut gamma_cache, &fixture.source, &fixture.text)
+        .expect("gamma run should succeed");
 
-    assert!(!gamma.probe_validity.extensions_disabled);
     assert_eq!(gamma.probe_validity.axes.len(), fixture.axes.len());
 
     for (assessment, expected_axis) in gamma.probe_validity.axes.iter().zip(fixture.axes.iter()) {

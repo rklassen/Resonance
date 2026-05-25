@@ -1,6 +1,6 @@
 use crate::beta::{load_public_fixtures, BetaFixturePrior};
 
-use super::{GammaConfig, GammaError};
+use super::GammaError;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GammaPriorSource {
@@ -21,6 +21,7 @@ pub enum GammaPriorAlignment {
 pub struct GammaPriorRecord {
     pub source: GammaPriorSource,
     pub prior_id: String,
+    pub source_record: Option<String>,
     pub alignment: GammaPriorAlignment,
     pub atlas_id: Option<String>,
     pub transform_id: Option<String>,
@@ -31,19 +32,9 @@ pub struct GammaPriorRecord {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GammaPriorEnsembleSuite {
     pub priors: Vec<GammaPriorRecord>,
-    pub extensions_disabled: bool,
 }
 
-pub fn run_gamma_prior_ensemble_suite(
-    config: &GammaConfig,
-) -> Result<GammaPriorEnsembleSuite, GammaError> {
-    if config.extensions_disabled {
-        return Ok(GammaPriorEnsembleSuite {
-            priors: Vec::new(),
-            extensions_disabled: true,
-        });
-    }
-
+pub fn run_gamma_prior_ensemble_suite() -> Result<GammaPriorEnsembleSuite, GammaError> {
     let fixtures = load_public_fixtures()?;
     let mut priors = fixtures
         .priors
@@ -80,7 +71,6 @@ pub fn run_gamma_prior_ensemble_suite(
 
     Ok(GammaPriorEnsembleSuite {
         priors,
-        extensions_disabled: false,
     })
 }
 
@@ -88,6 +78,7 @@ fn aligned_receptor_prior(atlas_id: &str, prior: &BetaFixturePrior) -> GammaPrio
     GammaPriorRecord {
         source: GammaPriorSource::ReceptorMaps,
         prior_id: prior.id.clone(),
+        source_record: Some(prior.source.clone()),
         alignment: GammaPriorAlignment::CoordinateAligned,
         atlas_id: Some(atlas_id.into()),
         transform_id: Some(prior.transform.clone()),
@@ -108,6 +99,7 @@ fn blocked_prior(
     GammaPriorRecord {
         source,
         prior_id: prior_id.into(),
+        source_record: None,
         alignment: GammaPriorAlignment::Blocked,
         atlas_id: None,
         transform_id: None,

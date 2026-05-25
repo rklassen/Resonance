@@ -24,19 +24,6 @@ pub use receptor::{
     run_gamma_receptor_bridge_suite, GammaReceptorBridgeSuite, GammaReceptorFamilyComparison,
 };
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct GammaConfig {
-    pub extensions_disabled: bool,
-}
-
-impl Default for GammaConfig {
-    fn default() -> Self {
-        Self {
-            extensions_disabled: true,
-        }
-    }
-}
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct GammaRun {
     pub beta: BetaRun,
@@ -45,7 +32,6 @@ pub struct GammaRun {
     pub probe_validity: GammaProbeValiditySuite,
     pub prior_ensemble: GammaPriorEnsembleSuite,
     pub receptor_bridge: GammaReceptorBridgeSuite,
-    pub config: GammaConfig,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -86,7 +72,7 @@ pub fn run_gamma_text(
     source: &str,
     text: &str,
 ) -> Result<GammaRun, GammaError> {
-    run_gamma_with_config(cache, load_text(source, text), GammaConfig::default())
+    run_gamma_artifact(cache, load_text(source, text))
 }
 
 pub fn run_gamma_image(
@@ -95,30 +81,20 @@ pub fn run_gamma_image(
     media_type: &str,
     bytes: &[u8],
 ) -> Result<GammaRun, GammaError> {
-    run_gamma_with_config(cache, load_image(source, media_type, bytes), GammaConfig::default())
+    run_gamma_artifact(cache, load_image(source, media_type, bytes))
 }
 
-pub fn run_gamma_text_with_config(
-    cache: &mut AlphaProbeCache,
-    source: &str,
-    text: &str,
-    config: GammaConfig,
-) -> Result<GammaRun, GammaError> {
-    run_gamma_with_config(cache, load_text(source, text), config)
-}
-
-fn run_gamma_with_config(
+fn run_gamma_artifact(
     cache: &mut AlphaProbeCache,
     artifact: AlphaArtifact,
-    config: GammaConfig,
 ) -> Result<GammaRun, GammaError> {
     let beta = run_beta_artifact(cache, artifact.clone())?;
     let probe_suite =
-        run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe, &config)?;
-    let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact, &config)?;
-    let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps, &config)?;
-    let prior_ensemble = run_gamma_prior_ensemble_suite(&config)?;
-    let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain, &config)?;
+        run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe)?;
+    let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact)?;
+    let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps)?;
+    let prior_ensemble = run_gamma_prior_ensemble_suite()?;
+    let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain)?;
 
     Ok(GammaRun {
         beta,
@@ -127,6 +103,5 @@ fn run_gamma_with_config(
         probe_validity,
         prior_ensemble,
         receptor_bridge,
-        config,
     })
 }
