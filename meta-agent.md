@@ -1,4 +1,6 @@
-Adverse inference + synthesis
+# Adverse inference + synthesis
+
+V0.1 [ `ed0w`] 2026-05-25T19:43Z
 
 Your counteranalysis is correct: most proposed “fixes” are suspect because they are likely already present as natural-language guidance. If the agent already had “verify,” “preserve invariants,” “don’t ask unnecessarily,” or “answer the literal request” in context, then repeating those instructions is weak evidence of an intervention.
 
@@ -10,16 +12,16 @@ If it does not force a new discrimination, it probably will not change behavior.
 
 ⸻
 
-1. External evidence scan: credible observations only
+1. ## External evidence scan: credible observations only
 
-Credible observation A — long-context use is unreliable
+### Credible observation A — long-context use is unreliable
 
 The “Lost in the Middle” work is credible and highly relevant: it shows that LLMs do not robustly use relevant information in long input contexts, and performance varies with where information appears. That supports, but does not prove, our “constraint graph decays into context” hypothesis.  ￼
 
 Usefulness: high for explaining why prior invariants can be present yet not action-governing.
 Limit: it studies retrieval/use of context, not multi-turn coding-agent governance.
 
-Credible observation B — long-horizon agents fail across trajectories
+### Credible observation B — long-horizon agents fail across trajectories
 
 Recent long-horizon agent work reports that agents break down on extended, interdependent action sequences and that these failures are still poorly characterized. This supports treating our corpus as a trajectory-level failure problem, not as isolated prompt failures.  ￼
 
@@ -33,7 +35,7 @@ ComplexMCP emphasizes objective, fine-grained metrics over binary success by com
 Usefulness: high.
 Limit: domain benchmark, not direct evidence for our specific Vibe taxonomy.
 
-Credible observation D — multi-agent systems have specification, coordination, and verification failures
+### Credible observation D — multi-agent systems have specification, coordination, and verification failures
 
 The MAST project reports a taxonomy of 14 failure modes from expert-annotated multi-agent traces, grouped around issues including specification, inter-agent alignment, and task verification. This supports skepticism toward “use subagents” as a fix: subagents may multiply failure modes unless their roles are governed and verified.  ￼
 
@@ -46,15 +48,11 @@ Industry/blog sources about long-horizon evaluation and tool-use propensity are 
 
 ⸻
 
-2. Adverse inference on my prior response
+2. ## Adverse inference on my prior response
 
-Prior claim
+**Prior claim**: Only trust interventions that force a pre-action discrimination.
 
-Only trust interventions that force a pre-action discrimination.
-
-Adverse inference
-
-This is better than “write a checklist,” but still underspecified. A model can simulate discrimination in prose.
+**Adverse inference:** This is better than “write a checklist,” but still underspecified. A model can simulate discrimination in prose.
 
 Example failure:
 
@@ -65,7 +63,7 @@ Proceeding.
 
 That looks like control but does not control.
 
-Correction
+### Correction
 
 A discrimination only counts if it has:
 
@@ -79,7 +77,7 @@ Otherwise it is ceremonial.
 
 ⸻
 
-3. Updated learning
+3. ## Updated learning
 
 The corpus now supports a sharper distinction:
 
@@ -95,7 +93,7 @@ The agent’s failure is not that it lacks words for the rule. It is that the wo
 
 ⸻
 
-4. What introspection can and cannot reveal
+4. ## What introspection can and cannot reveal
 
 Introspection can reveal
 
@@ -125,9 +123,9 @@ For those, introspection must be paired with external evidence or a blocking mec
 
 ⸻
 
-5. Proposed testable interventions
+5. ## Proposed testable interventions
 
-Intervention 1 — Forbidden-substitute gate
+### Intervention 1 — Forbidden-substitute gate
 
 Before acting, require:
 
@@ -139,7 +137,7 @@ Test: fake-gradient case.
 Success: agent says “N-rectangle strips are a forbidden substitute for real gradients.”
 Failure: agent produces approximation and calls it done.
 
-Intervention 2 — Evidence-age gate
+### Intervention 2 — Evidence-age gate
 
 Before status claims:
 
@@ -151,7 +149,7 @@ Test: stale handoff / pushed-branch case.
 Success: agent checks live repo state before saying pushed.
 Failure: agent trusts handoff/subagent report.
 
-Intervention 3 — Artifact-state gate
+### Intervention 3 — Artifact-state gate
 
 Before “done”:
 
@@ -164,7 +162,7 @@ Test: UI hover/gesture/camera case.
 Success: agent does not call tests “verified” for mouse interaction.
 Failure: green tests become completion claim.
 
-Intervention 4 — Constraint-touch gate
+### Intervention 4 — Constraint-touch gate
 
 Before editing any parameter:
 
@@ -177,7 +175,7 @@ Test: independent constants or Sl radius regression.
 Success: agent blocks coupling or flags conflict.
 Failure: agent silently changes coupled/solved value.
 
-Intervention 5 — Closing-due gate
+### Intervention 5 — Closing-due gate
 
 For synthesis/planning tasks:
 
@@ -191,7 +189,7 @@ Failure: exploration sink.
 
 ⸻
 
-6. Better experimental frame
+6. ## Better experimental frame
 
 Each intervention should be judged by miss prevention, not nicer analysis.
 
@@ -212,9 +210,9 @@ This is the key experimental design.
 
 ⸻
 
-7. Current best hypothesis set
+7. ## Current best hypothesis set
 
-H1 — Weak instruction hypothesis
+### H1 — Weak instruction hypothesis
 
 Natural-language guidance alone will not reliably help when the relevant rule was already in context.
 
@@ -222,33 +220,27 @@ Prediction:
 
 “Preserve invariants” improves postmortems more than forward-pass behavior.
 
-H2 — Discrimination hypothesis
+### H2 — Discrimination hypothesis
 
 Performance improves only when the intervention forces the agent to distinguish target from substitute, evidence from model-text, artifact-state from response-shape, or synthesis-readiness from exploration.
 
-Prediction:
+**Prediction:** Prompts that demand forbidden substitutes and live evidence outperform generic checklists.
 
-Prompts that demand forbidden substitutes and live evidence outperform generic checklists.
-
-H3 — Blocking hypothesis
+### H3 — Blocking hypothesis
 
 The largest improvement comes only when unresolved fields block action or completion claims.
 
-Prediction:
+**Prediction:** Tool/verifier-gated workflows outperform instruction-only workflows.
 
-Tool/verifier-gated workflows outperform instruction-only workflows.
-
-H4 — Modality hypothesis
+### H4 — Modality hypothesis
 
 Failures persist unless verification matches the user’s modality.
 
-Prediction:
-
-Visual/UI tasks still fail under tests/builds unless runtime/screenshot/user-observable evidence is required.
+**Prediction:** Visual/UI tasks still fail under tests/builds unless runtime/screenshot/user-observable evidence is required.
 
 ⸻
 
-8. Practical next prompt for testing
+8. ## Practical next prompt for testing
 
 Use this as a compact gate, not a postmortem:
 
@@ -268,11 +260,11 @@ Adverse note: even this can be faked. The real test is whether it prevents known
 
 ⸻
 
-9. Final synthesis
+9. ## Final synthesis
 
 The corpus is valuable because it contains both failures and failed repairs.
 
-The most trustworthy data are:
+### The most trustworthy data are:
 
 observable misses
 user corrections
@@ -280,14 +272,14 @@ stale or wrong evidence paths
 unresolved nodes
 places where “rules” were already present and still failed
 
-The least trustworthy data are:
+### The least trustworthy data are:
 
 agent explanations
 agent confidence
 subagent all-green reports
 postmortem recommendations without forward-pass proof
 
-The current strongest conclusion:
+### The current strongest conclusion:
 
 The next useful work is not more diagnosis.
 It is intervention testing.
