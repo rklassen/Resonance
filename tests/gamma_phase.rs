@@ -125,6 +125,40 @@ fn gamma_receptor_bridge_emits_provenanced_family_comparisons() {
 }
 
 #[test]
+fn gamma_dual_path_runtime_emits_independent_path_traces_before_comparison() {
+    let mut gamma_cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text(
+        &mut gamma_cache,
+        "artifact://gamma/text/dual-path",
+        "A reflective hallway holds a bright pulse while a tense narrative hum keeps rising.",
+    )
+    .expect("gamma run should succeed");
+
+    let objective = &gamma.dual_path_runtime.objective_path;
+    let narrative = &gamma.dual_path_runtime.narrative_path;
+
+    assert_eq!(objective.state_seed.len(), gamma.beta.graph.node_count);
+    assert!(objective.trace.operator_executions.contains(&objective.execution.id));
+    assert!(objective.trace.operator_executions.contains(&objective.graph_execution.id));
+    assert!(objective.trace.payloads.contains(&objective.graph_payload.id));
+    assert!(objective.trace.payloads.contains(&objective.payload.id));
+    assert!(objective.trace.payloads.contains(&gamma.beta.embedding_probe.payload.id));
+    assert!(objective.trace.gate_results.is_empty());
+
+    assert!(narrative.trace.payloads.contains(&gamma.beta.label_probe.payload.id));
+    assert!(narrative.trace.payloads.contains(&gamma.beta.vibes.payload_12d.id));
+    assert!(narrative.trace.payloads.contains(&gamma.beta.vibes.payload_11d.id));
+    assert!(narrative.trace.payloads.contains(&gamma.beta.gain.payload.id));
+    assert!(narrative.trace.payloads.contains(&narrative.bridge_payload.id));
+    assert_eq!(narrative.bridge_execution.input_payloads, vec![gamma.beta.gain.payload.id.clone()]);
+    assert_eq!(narrative.family_names.len(), narrative.family_mean_vector.len());
+    assert!(!narrative.family_names.is_empty());
+
+    assert_ne!(objective.trace.id, narrative.trace.id);
+    assert!(narrative.trace.gate_results.is_empty());
+}
+
+#[test]
 fn gamma_prior_ensemble_marks_each_prior_aligned_or_blocked() {
     let fixtures = load_public_fixtures().expect("beta public fixtures should load");
     let mut gamma_cache = AlphaProbeCache::default();

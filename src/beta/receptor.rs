@@ -30,6 +30,21 @@ pub struct BetaGainTerm {
     pub evidence_axes: Vec<String>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct BetaAxisSummary {
+    valence: f32,
+    arousal: f32,
+    dominance: f32,
+    warmth: f32,
+    tension: f32,
+    coherence: f32,
+    novelty: f32,
+    weight: f32,
+    brightness: f32,
+    depth: f32,
+    motion: f32,
+}
+
 pub fn real_receptor_gain(
     fixtures: &BetaPublicFixtures,
     vibes: &AlphaVibes,
@@ -208,21 +223,6 @@ fn sha256_hex(chunks: &[&[u8]]) -> String {
 
 fn short_id(value: &str) -> String {
     value.chars().take(12).collect()
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-struct BetaAxisSummary {
-    valence: f32,
-    arousal: f32,
-    dominance: f32,
-    warmth: f32,
-    tension: f32,
-    coherence: f32,
-    novelty: f32,
-    weight: f32,
-    brightness: f32,
-    depth: f32,
-    motion: f32,
 }
 
 impl BetaAxisSummary {

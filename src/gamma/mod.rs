@@ -1,6 +1,7 @@
 mod prior;
 mod probe;
 mod receptor;
+mod runtime;
 
 use std::fmt::{Display, Formatter};
 
@@ -23,6 +24,9 @@ pub use probe::{
 pub use receptor::{
     run_gamma_receptor_bridge_suite, GammaReceptorBridgeSuite, GammaReceptorFamilyComparison,
 };
+pub use runtime::{
+    run_gamma_dual_path_runtime, GammaDualPathRuntime, GammaNarrativePath, GammaObjectivePath,
+};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GammaRun {
@@ -32,6 +36,7 @@ pub struct GammaRun {
     pub probe_validity: GammaProbeValiditySuite,
     pub prior_ensemble: GammaPriorEnsembleSuite,
     pub receptor_bridge: GammaReceptorBridgeSuite,
+    pub dual_path_runtime: GammaDualPathRuntime,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -95,6 +100,7 @@ fn run_gamma_artifact(
     let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps)?;
     let prior_ensemble = run_gamma_prior_ensemble_suite()?;
     let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain)?;
+    let dual_path_runtime = run_gamma_dual_path_runtime(&beta)?;
 
     Ok(GammaRun {
         beta,
@@ -103,5 +109,6 @@ fn run_gamma_artifact(
         probe_validity,
         prior_ensemble,
         receptor_bridge,
+        dual_path_runtime,
     })
 }
