@@ -1,6 +1,6 @@
 # Adverse inference + synthesis
 
-V0.1 [ `ed0w`] 2026-05-25T19:43Z
+V0.2 [ `p3ba` ~~ed0w~~] 2026-05-25T22:20Z
 
 Your counteranalysis is correct: most proposed “fixes” are suspect because they are likely already present as natural-language guidance. If the agent already had “verify,” “preserve invariants,” “don’t ask unnecessarily,” or “answer the literal request” in context, then repeating those instructions is weak evidence of an intervention.
 
@@ -90,6 +90,28 @@ Checklist completion ≠ artifact satisfaction.
 This is the main learning.
 
 The agent’s failure is not that it lacks words for the rule. It is that the words are not reliably converted into action constraints.
+
+
+### Additional subtype — coincidence as identity
+
+Coincidence of representation is not evidence of identity. Distinct things may share the same value, name-shape, surface, or local representation while remaining independently governed.
+
+This is not a new root beyond representation/action confusion; it is a forecast-useful subtype.
+
+Failure shape:
+
+surface sameness → assumed identity → independent distinction erased
+
+Examples:
+
+- two constants both equal `68.0` → agent aliases them
+- two call sites both use `× 1.6` → agent treats one edit as covering both
+- two terms seem synonymous → agent replaces user vocabulary
+- written rule exists → agent treats existence as application
+
+Rule:
+
+Default to distinctness. Coincidence of value is coincidence, not evidence. Identity requires explicit user/source/provenance evidence.
 
 ⸻
 
@@ -238,6 +260,12 @@ Failures persist unless verification matches the user’s modality.
 
 **Prediction:** Visual/UI tasks still fail under tests/builds unless runtime/screenshot/user-observable evidence is required.
 
+### H5 — Distinctness hypothesis
+
+Failures recur when the agent treats coincident representations as identity evidence.
+
+**Prediction:** Tasks involving duplicated values, repeated constants, similar terms, or parallel call sites fail unless the intervention forces independent-identity checks before editing or renaming.
+
 ⸻
 
 8. ## Practical next prompt for testing
@@ -271,6 +299,7 @@ user corrections
 stale or wrong evidence paths
 unresolved nodes
 places where “rules” were already present and still failed
+places where coincident representations caused distinct things to be collapsed
 
 ### The least trustworthy data are:
 
