@@ -1,3 +1,4 @@
+pub mod alpha;
 pub mod artifact;
 pub mod claim;
 pub mod gate;
@@ -10,6 +11,7 @@ pub mod requirement;
 pub mod state;
 pub mod trace;
 
+pub use alpha::*;
 pub use artifact::*;
 pub use claim::*;
 pub use gate::*;
