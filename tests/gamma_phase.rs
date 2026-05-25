@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use resonance::{
     run_beta_text, run_gamma_text, run_gamma_text_with_config, AlphaProbeCache, GammaConfig,
-    GammaFailureModeDisposition, GammaFailureModeKind, GammaLatentAxisStability,
+    GammaFailureMode, GammaFailureModeDisposition, GammaLatentAxisStability,
 };
 
 const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
@@ -179,22 +179,22 @@ fn gamma_probe_validity_blocks_unstable_axis_promotion() {
         let prompt_sensitivity = assessment
             .failure_modes
             .iter()
-            .find(|failure| failure.kind == GammaFailureModeKind::PromptSensitivity)
+            .find(|failure| failure.mode == GammaFailureMode::PromptSensitivity)
             .expect("prompt sensitivity assessment should exist");
         assert_eq!(prompt_sensitivity.disposition, GammaFailureModeDisposition::Observed);
         assert!(prompt_sensitivity.detail.contains("unstable"));
         assert!(prompt_sensitivity.required_follow_up.is_some());
 
         for kind in [
-            GammaFailureModeKind::ModelDisagreement,
-            GammaFailureModeKind::EmbeddingNeighborhoodInstability,
-            GammaFailureModeKind::LabelCollision,
-            GammaFailureModeKind::DomainMismatch,
+            GammaFailureMode::ModelDisagreement,
+            GammaFailureMode::EmbeddingNeighborhoodInstability,
+            GammaFailureMode::LabelCollision,
+            GammaFailureMode::DomainMismatch,
         ] {
             let blocked = assessment
                 .failure_modes
                 .iter()
-                .find(|failure| failure.kind == kind)
+                .find(|failure| failure.mode == kind)
                 .expect("blocked failure-mode assessment should exist");
             assert_eq!(blocked.disposition, GammaFailureModeDisposition::Blocked);
             assert!(blocked.required_follow_up.is_some());

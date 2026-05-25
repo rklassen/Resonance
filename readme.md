@@ -137,6 +137,10 @@ Engineering rules:
 6. Keep functions attached to stateless structs at minimum. If an object is
    already defined then prefer object methods, but determinism and immutability
    remain principal goals.
+7. Do not introduce `Kind` buckets in type names or fields. Name the actual
+   role instead, such as `mode`, `status`, `phase`, `contract`, or another
+   concrete term. `Kind` is treated here as a cognitive-complexity smell and a
+   design failure mode because it hides meaning behind a generic bucket.
 
 ## Important distinctions
 

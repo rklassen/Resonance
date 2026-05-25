@@ -9,8 +9,8 @@ use crate::{
 
 pub use probe::{
     run_gamma_latent_sweep_suite, run_gamma_probe_suite, run_gamma_probe_validity_suite,
-    GammaAxisValidityAssessment, GammaFailureModeAssessment, GammaFailureModeDisposition,
-    GammaFailureModeKind, GammaLatentAxisStability, GammaLatentAxisSweep,
+    GammaAxisValidityAssessment, GammaFailureMode, GammaFailureModeAssessment,
+    GammaFailureModeDisposition, GammaLatentAxisStability, GammaLatentAxisSweep,
     GammaLatentAxisVariantRun, GammaLatentPromptVariant, GammaLatentSweepSuite, GammaProbeFamily,
     GammaProbeFamilyRun, GammaProbeSuite, GammaProbeValiditySuite,
 };
