@@ -11,6 +11,75 @@ We are not building the complete graph. This workshop entry intends to
 synthesize learnings from clinical studies, and apply advanced cognitive
 models, sparsely for shortest path implementation.
 
+## Wayfinding
+
+```text
+resonance/
+|- readme.md                 - repo entry point, engineering rules, and navigation.
+|- Cargo.toml                - Rust package manifest for the runtime crate.
+|- Cargo.lock                - locked Rust dependency graph.
+|- rustfmt.toml              - formatter policy for Rust source.
+|- artifacts/
+|  |- readme.md              - artifact-level notes.
+|  |- alpha/                 - phase-alpha outputs and support artifacts.
+|  |- beta/                  - phase-beta fixtures and generated artifacts.
+|  `- gamma/                 - phase-gamma artifacts and outputs.
+|- contracts/
+|  |- readme.md              - contract entry point and category map.
+|  `- *.md                   - role contracts for artifact, probe, payload,
+|                             operator, state, requirement, gate, trace,
+|                             claim, and output.
+|- plan/
+|  |- developer_document.md  - working developer handoff and execution notes.
+|  |- implementation-plan.rs - natural-language implementation plan.
+|  `- implementation-plan.snap
+|                           - Snap-encoded plan DAG and phase graph.
+|- procedure/
+|  `- verify-lm.md           - verification procedure and scoring discipline.
+|- specification/
+|  |- engineering-rules.md   - locked engineering constraints.
+|  |- requirements*.md       - active requirements and split section-11
+|  |                          supplements.
+|  `- snap-spec-0.8.md       - stable Snap DSL reference.
+|- src/
+|  |- lib.rs                 - crate export surface.
+|  |- alpha/                 - alpha-phase runtime implementation.
+|  |- beta/                  - beta-phase privileged-path implementation.
+|  |- gamma/                 - gamma-phase shell and extension seams.
+|  `- *.rs                   - shared contracts and top-level data records.
+|- tests/
+|  `- *_phase.rs             - sparse phase-level integration tests.
+`- schmae/                   - auxiliary schema area; currently repo-local and
+                               separate from the main specification tree.
+```
+
+## Markdown Index
+
+Currency is omitted from this flat list.
+`plan/developer_document.md` is a current working handoff and state-view, so it
+is intentionally excluded from the enduring repo index.
+
+- [readme.md](readme.md)
+- [artifacts/readme.md](artifacts/readme.md)
+- [contracts/readme.md](contracts/readme.md)
+- [contracts/artifact.md](contracts/artifact.md)
+- [contracts/claim.md](contracts/claim.md)
+- [contracts/gate.md](contracts/gate.md)
+- [contracts/operator.md](contracts/operator.md)
+- [contracts/output.md](contracts/output.md)
+- [contracts/payload.md](contracts/payload.md)
+- [contracts/probe.md](contracts/probe.md)
+- [contracts/requirement.md](contracts/requirement.md)
+- [contracts/state.md](contracts/state.md)
+- [contracts/trace.md](contracts/trace.md)
+- [procedure/verify-lm.md](procedure/verify-lm.md)
+- [specification/engineering-rules.md](specification/engineering-rules.md)
+- [specification/requirements.md](specification/requirements.md)
+- [specification/requirements-11-role-set.md](specification/requirements-11-role-set.md)
+- [specification/requirements-12-phase-claim-trace.md](specification/requirements-12-phase-claim-trace.md)
+- [specification/requirements-13-contract-alignment.md](specification/requirements-13-contract-alignment.md)
+- [specification/snap-spec-0.8.md](specification/snap-spec-0.8.md)
+
 ## development process
 
 The development is planned in three principal phases with intermediate
@@ -51,6 +120,9 @@ by priors.
 Engineering rules:
 
 1. Keep all files under a 400-line hard cap.
+   Exception(s): `specification/snap-spec-0.8.md`.
+   The Snap DSL reference remains whole even when it exceeds the general
+   document cap.
 2. Evaluate file length only after the language auto formatter has produced the
    final form. For Rust, judge the file after the normal vertical formatter
    style has been applied.

@@ -51,8 +51,13 @@ The implementation must satisfy these invariants:
    weakening validation.
 8. Runtime humility. Requirements must avoid assuming a specific deployment
    environment beyond what is explicitly declared in code or metadata.
-9. Small units. Source files must stay under 400 lines, and components should
-   remain narrow enough to validate locally.
+9. Small units. Files must satisfy the applicable repo line cap after normal
+   formatter output. The workshop target remains under 400 lines, except for
+   the stable Snap DSL reference at `specification/snap-spec-0.8.md`, which
+   remains whole by explicit exception. Rust source files must in all cases
+   remain within the locked repo cap.
+10. Release-first validation. Rust validation and executable checks must run
+    in `--release` by default unless the active task is explicitly debugging.
 
 ## 4. Architectural Requirements
 
@@ -81,7 +86,7 @@ The implementation must satisfy these invariants:
 ### 4.3 Phase Evolution
 
 1. Phase transitions must be explicit and labeled as promoted, wrapped,
-   replaced, extended, stress-tested, transformed, removed, or deferred.
+   replaced, extended, stress-tested, or removed.
 2. No implicit upgrade path is allowed.
 3. Later phases may extend earlier ones, but gamma behavior must reduce to the
    verified beta substrate when gamma-specific dynamics are disabled.
@@ -239,280 +244,13 @@ more declarative option should be preferred.
 
 ## 11. Requirement Ontology and Contract Alignment
 
-This section supplements the active requirements without replacing or weakening
-the preceding sections. It defines the front-end category separation needed so
-implementation agents do not commingle durable entities, evaluator processes,
-runtime currency, lifecycle state, requirements, verification gates, traces,
-claims, and workshop outputs.
-
-### 11.1 Role Set
-
-Every declared record, node, edge, process, file, and visible statement must
-belong to one primary role:
-
-1. Artifact: source entity inspected by Resonance.
-2. Probe: evaluator process, never a coding instruction.
-3. Payload: immutable runtime currency.
-4. Operator: executable process over declared inputs and outputs.
-5. State: lifecycle or phase-local condition, never identity.
-6. Requirement: obligation stating what must be true.
-7. Gate: executable check for whether proceeding is valid.
-8. Trace: provenance record of what happened.
-9. Claim: supported, blocked, or deferred reportable statement.
-10. Output: system-level workshop deliverable assembled from traceable records.
-
-These roles are independent dimensions. The implementation must not collapse
-them for convenience.
-
-### 11.2 No Broad `Kind` Enum Rule
-
-The implementation must not introduce broad semantic bucket enums such as:
-
-```text
-ProbeKind
-PayloadKind
-ArtifactKind
-TraceKind
-RequirementKind
-OutputKind
-```
-
-Use contracts, capabilities, policies, lifecycle states, statuses, and gate
-decisions instead.
-
-Acceptable examples:
-
-```text
-ContractId
-CapabilityId
-PolicyId
-StateLabel
-ClaimStatus
-GateDecision
-RequirementStatus
-```
-
-Broad `Kind` enums hide domain semantics and create future migration cost.
-
-### 11.3 Coding Apparatus vs Evaluator Apparatus
-
-Coding-agent instructions and evaluator declarations must remain separate.
-
-Coding-agent instructions belong in:
-
-```text
-plan/
-procedure/
-implementation notes
-developer prompts
-```
-
-Evaluator declarations belong in:
-
-```text
-contracts/
-registry/
-Snap operators
-runtime manifests
-```
-
-A prompt that tells an agent to write a probe wrapper is not itself a probe.
-
-### 11.4 Phase Model Clarification
-
-Phase tokens such as `alpha`, `beta`, `gamma`, `Α`, `Β`, and `Γ` are cognitive
-handles, not a fixed lifecycle.
-
-Requirements:
-
-1. Phase count is variable.
-2. A phase exists only when it reduces inference load, integration risk,
-   runtime uncertainty, component ambiguity, or verification ambiguity.
-3. Trivial cases may use one phase.
-4. Complex cases may use many phases.
-5. A phase token must not become durable identity.
-6. A phase-local requirement must not be applied outside its declared phase.
-
-### 11.5 Temporary State vs Final Requirement
-
-Temporary scaffolds are permitted only when explicit.
-
-Examples:
-
-```text
-mock
-stub
-shape-proof
-fixture-backed
-exploratory
-```
-
-Rules:
-
-1. Temporary states must be phase-scoped.
-2. Temporary states may prove shape.
-3. Temporary states may not prove truth.
-4. Temporary states must have explicit replacement, deferral, removal, or
-   promotion path.
-5. Reports must disclose temporary state when it affects interpretation.
-
-### 11.6 Output vs Payload
-
-The `output/` directory is reserved for system-level workshop deliverables.
-
-Payloads are runtime currency. They may contribute to output, but they are not
-automatically output.
-
-Requirements:
-
-1. Local operator `.out` must not be confused with `output/`.
-2. Final output must assemble from traces, claims, gate results, and source
-   records.
-3. Output must not bypass trace.
-4. Output must preserve blocked claims and disagreement.
-
-### 11.7 Claim Discipline
-
-Every visible statement must be represented as a claim record or remain outside
-the report.
-
-Claim statuses:
-
-```text
-ObservedFact
-DerivedClaim
-BlockedClaim
-DeferredClaim
-```
-
-Requirements:
-
-1. Observed facts require direct support.
-2. Derived claims require operator path support.
-3. Blocked claims require named blocker.
-4. Deferred claims require named future gate, phase, or dependency.
-5. Clinical claims, direct NT measurement claims, fabricated labels, and final
-   truth claims from probe output alone are prohibited.
-
-### 11.8 Gate Discipline Extension
-
-The active requirements already define Integration, Performance, and Accuracy
-as verification axes. This section clarifies gate behavior.
-
-Requirements:
-
-1. Gates are executable checks, not prose review.
-2. A gate must declare subject contract, prerequisite gates, fitness function,
-   phase scope, failure policy, and applicable requirements.
-3. A gate result must be Pass, Fail, Blocked, or Deferred.
-4. A zero on any governing axis is stop-and-surface.
-5. Any axis below `Yes` requires a named follow-up observation.
-6. Shape verification must not be treated as truth verification.
-
-### 11.9 Trace Discipline Extension
-
-Every visible output must be trace-supported.
-
-A trace must link:
-
-```text
-artifact identity
-operator executions
-payload ids
-Snap path
-gate results
-claim records
-blocked claims
-phase scope
-```
-
-A trace must not embed hidden runtime values. Runtime values belong in payloads.
-
-### 11.10 Overfit and Probe-Validity Discipline
-
-Probe results are diagnostic, not truth.
-
-Requirements:
-
-1. Frozen probes must record model provenance, prompt provenance when present,
-   preprocessing provenance, runtime policy, and tolerance policy.
-2. Probe outputs must remain separate until an explicit aggregation operator
-   creates a new payload.
-3. Learned probes are not baseline.
-4. If learned probes are introduced, they require training data provenance,
-   held-out evaluation, negative/control task, capacity constraint, and
-   selectivity report.
-5. Prompt sensitivity and cross-model disagreement must be surfaced where
-   high-confidence use depends on probe stability.
-
-### 11.11 Contract Coverage Requirement
-
-The following contracts define the minimum front-end separation layer:
-
-```text
-artifact.md
-probe.md
-payload.md
-operator.md
-state.md
-requirement.md
-gate.md
-trace.md
-claim.md
-output.md
-```
-
-Implementation agents must read these contracts before deriving final Rust
-records, Snap operators, or verification procedures.
-
-### 11.12 Requirements-to-Contract Alignment
-
-Each requirement must map to one or more contracts and one or more gates.
-
-Minimum alignment:
-
-```text
-artifact intake -> artifact.md + gate.md
-frozen probes -> probe.md + payload.md + gate.md
-cache -> payload.md + trace.md + gate.md
-state projection -> operator.md + payload.md + state.md
-prior bridge -> operator.md + payload.md + trace.md
-graph runtime -> operator.md + payload.md + trace.md + gate.md
-disagreement -> claim.md + output.md + trace.md
-phase evolution -> state.md + requirement.md + gate.md
-reporting -> trace.md + claim.md + output.md
-```
-
-### 11.13 Implementation Agent Rule
-
-A coding assistant may implement code from these documents, but must not invent
-new category shortcuts.
-
-Before implementing a module, an agent must answer:
-
-```text
-What role is this?
-What contract governs it?
-What inputs are declared?
-What outputs are declared?
-What gate verifies it?
-What trace records it?
-What phase scope applies?
-Can it support claims?
-```
-
-If any answer is missing, the module is not ready.
-
-### 11.14 Acceptance of This Section
-
-This requirements section is accepted when:
-
-1. no preceding requirement is weakened,
-2. every major role has a contract,
-3. implementation agents have an entry point for category separation,
-4. phase tokens remain organizational handles,
-5. temporary state cannot masquerade as final truth,
-6. outputs cannot bypass traces,
-7. probes cannot become opaque truth machines,
-8. no broad `Kind` enum pattern is introduced.
+This section remains active, but it is split into flat companion documents so
+the requirements stay complete without compressing content or creating nested
+document trees.
+
+Read these in order:
+
+1. `requirements-11-role-set.md`
+2. `requirements-12-phase-claim-trace.md`
+3. `requirements-13-contract-alignment.md`
 
