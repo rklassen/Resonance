@@ -1,0 +1,617 @@
+🪢snap gamma-phase-evolution
+.graph {
+ gen: 0,
+ id: gph8,
+ name: 'Gamma Phase Evolution Graph',
+ operators: 'ops/resonance/',
+ time: 2026-05-24T00:00:00Z,
+ types: None,
+ version: 0.8,
+ workspace: './resonance/',
+}
+
+edges {
+ build {
+  @a101 -> @a301.in.before,
+  @a301.out.after -> @b101,
+  @a102 -> @b302.in.before,
+  @b302.out.after -> @b102,
+  @a103 -> @b303.in.before,
+  @b303.out.after -> @b103,
+  @a104 -> @b304.in.before,
+  @b304.out.after -> @b104,
+  @a105 -> @b305.in.before,
+  @b305.out.after -> @b105,
+  @a106 -> @b306.in.before,
+  @b306.out.after -> @b106,
+  @a107 -> @b307.in.before,
+  @b307.out.after -> @b107,
+  @a108 -> @b308.in.before,
+  @b308.out.after -> @b108,
+  @a109 -> @b309.in.before,
+  @b309.out.after -> @b109,
+
+  @b101 -> @g301.in.before,
+  @g301.out.after -> @g101,
+  @b102 -> @g302.in.before,
+  @g302.out.after -> @g102,
+  @b103 -> @g303.in.before,
+  @g303.out.after -> @g103,
+  @b104 -> @g304.in.before,
+  @g304.out.after -> @g104,
+  @b105 -> @g305.in.before,
+  @g305.out.after -> @g105,
+  @b106 -> @g306.in.before,
+  @g306.out.after -> @g106,
+  @b107 -> @g307.in.before,
+  @g307.out.after -> @g107,
+  @b108 -> @g308.in.before,
+  @g308.out.after -> @g108,
+  @b109 -> @g309.in.before,
+  @g309.out.after -> @g109,
+ }
+
+ flow {
+  @a101 -> @a102 -> @a103 -> @a104 -> @a105 -> @a106 -> @a107 -> @a108 -> @a109,
+  @b101 -> @b102 -> @b103 -> @b104 -> @b105 -> @b106 -> @b107 -> @b108 -> @b109,
+  @g101 -> @g102 -> @g103 -> @g104 -> @g105 -> @g106 -> @g107 -> @g108 -> @g109,
+ }
+
+ verify {
+  @a101 -> @o101,
+  @a103 -> @o103,
+  @a105 -> @o105,
+  @a109 -> @o109,
+
+  @b101 -> @o201,
+  @b105 -> @o205,
+  @b107 -> @o207,
+  @b109 -> @o209,
+
+  @g103 -> @o303,
+  @g105 -> @o305,
+  @g108 -> @o308,
+  @g109 -> @o309,
+ }
+
+ evidence {
+  @b105 -> @p201,
+  @b107 -> @p202,
+  @g103 -> @p203,
+  @g108 -> @p204,
+ }
+
+ dynamics {
+  @b104 -(@receptor_gain_op)s-> @b105,
+  @b105 -(@parcel_gain_op)s-> @b106,
+  @b106 -(@laplacian_walk_op)s-> @b107,
+
+  @g104 -(@receptor_ensemble_op)s-> @g105,
+  @g105 -(@magnetic_wavelet_op)s-> @g107,
+  @g107 -(@width_energy_op)s-> @g108,
+ }
+
+ risk {
+  @a106 -> @r101,
+  @a107 -> @r102,
+  @b108 -> @r201,
+  @g107 -> @r301,
+ }
+}
+
+extras {
+ convention: {
+  phase-suffixes: 'Α, Β, Γ',
+  payload-marker: '❇',
+  semantic-names-use-dashes: true,
+  snap-ids-remain-ascii: true,
+ },
+ no-loose-end-states: [
+  'verified',
+  'deferred-to-next-phase',
+  'removed-as-violative',
+  'blocked-with-named-dependency',
+ ],
+}
+
+layout {
+}
+
+literals {
+ alpha-phase$la01: string = 'Α',
+ beta-phase$lb01: string = 'Β',
+ gamma-phase$lg01: string = 'Γ',
+}
+
+nodes {
+ object {
+  id: a101,
+  name: 'Snap-Spine-Α',
+  type: SnapSpine,
+ }
+
+ object {
+  id: a102,
+  name: 'Artifact-Intake-Α',
+  type: ArtifactIntake,
+ }
+
+ object {
+  id: a103,
+  name: 'Frozen-Probe-Α',
+  type: FrozenProbe,
+ }
+
+ object {
+  id: a104,
+  name: 'Probe-Cache-Α',
+  type: ProbeCache,
+ }
+
+ object {
+  id: a105,
+  name: 'Vibes-Projection-Α',
+  type: VibesProjection,
+ }
+
+ object {
+  id: a106,
+  name: 'Receptor-Gain-Α',
+  type: ReceptorGain,
+ }
+
+ object {
+  id: a107,
+  name: 'Parcel-Graph-Α',
+  type: ParcelGraph,
+ }
+
+ object {
+  id: a108,
+  name: 'Laplacian-Walk-Α',
+  type: LaplacianWalk,
+ }
+
+ object {
+  id: a109,
+  name: 'Trace-Report-Α',
+  type: TraceReport,
+ }
+
+ object {
+  id: b101,
+  name: 'Snap-Spine-Β',
+  type: SnapSpine,
+ }
+
+ object {
+  id: b102,
+  name: 'Probe-Registry-Β',
+  type: ProbeRegistry,
+ }
+
+ object {
+  id: b103,
+  name: 'Probe-Cache-Β',
+  type: ProbeCache,
+ }
+
+ object {
+  id: b104,
+  name: 'Vibes-Projection-Β',
+  type: VibesProjection,
+ }
+
+ object {
+  id: b105,
+  name: 'Receptor-Bridge-Β',
+  type: ReceptorBridge,
+ }
+
+ object {
+  id: b106,
+  name: 'Parcel-Graph-Β',
+  type: ParcelGraph,
+ }
+
+ object {
+  id: b107,
+  name: 'Laplacian-Runtime-Β',
+  type: LaplacianRuntime,
+ }
+
+ object {
+  id: b108,
+  name: 'Disagreement-Width-Β',
+  type: DisagreementWidth,
+ }
+
+ object {
+  id: b109,
+  name: 'Requirements-Report-Β',
+  type: RequirementsReport,
+ }
+
+ object {
+  id: g101,
+  name: 'Probe-Suite-Γ',
+  type: ProbeSuite,
+ }
+
+ object {
+  id: g102,
+  name: 'Latent-Axis-Sweep-Γ',
+  type: LatentAxisSweep,
+ }
+
+ object {
+  id: g103,
+  name: 'Probe-Validity-Evaluator-Γ',
+  type: ProbeValidityEvaluator,
+ }
+
+ object {
+  id: g104,
+  name: 'Prior-Ensemble-Γ',
+  type: PriorEnsemble,
+ }
+
+ object {
+  id: g105,
+  name: 'Receptor-Bridge-Γ',
+  type: ReceptorBridge,
+ }
+
+ object {
+  id: g106,
+  name: 'Dual-Path-Runtime-Γ',
+  type: DualPathRuntime,
+ }
+
+ object {
+  id: g107,
+  name: 'Magnetic-Wavelet-Runtime-Γ',
+  type: MagneticWaveletRuntime,
+ }
+
+ object {
+  id: g108,
+  name: 'Cross-Projection-Readout-Γ',
+  type: CrossProjectionReadout,
+ }
+
+ object {
+  id: g109,
+  name: 'Discovery-Surface-Γ',
+  type: DiscoverySurface,
+ }
+
+ object {
+  id: o101,
+  name: 'Observe-Snap-Roundtrip❇alpha',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o103,
+  name: 'Observe-Probe-Stability❇alpha',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o105,
+  name: 'Observe-Vibes-Vector❇alpha',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o109,
+  name: 'Observe-Totality-Trace❇alpha',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o201,
+  name: 'Observe-Dynamic-Edge-Resolution❇beta',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o205,
+  name: 'Observe-Receptor-Alignment❇beta',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o207,
+  name: 'Observe-Laplacian-Replay❇beta',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o209,
+  name: 'Observe-Beta-Pass-Fail❇beta',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o303,
+  name: 'Observe-Probe-Sensitivity❇gamma',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o305,
+  name: 'Observe-Prior-Agreement❇gamma',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o308,
+  name: 'Observe-Cross-Projection❇gamma',
+  type: ObservationNode,
+ }
+
+ object {
+  id: o309,
+  name: 'Observe-Discovery-Surface❇gamma',
+  type: ObservationNode,
+ }
+
+ object {
+  id: p201,
+  name: 'Neuromaps-Prior❇source',
+  type: EvidenceSource,
+ }
+
+ object {
+  id: p202,
+  name: 'Graph-Neural-Fields❇source',
+  type: EvidenceSource,
+ }
+
+ object {
+  id: p203,
+  name: 'Probe-Limits❇source',
+  type: EvidenceSource,
+ }
+
+ object {
+  id: p204,
+  name: 'BrainSpace-Gradients❇source',
+  type: EvidenceSource,
+ }
+
+ object {
+  id: r101,
+  name: 'Mock-Receptor-Deferred❇alpha',
+  type: RiskRecord,
+ }
+
+ object {
+  id: r102,
+  name: 'Mock-Parcel-Graph-Deferred❇alpha',
+  type: RiskRecord,
+ }
+
+ object {
+  id: r201,
+  name: 'Width-Proxy-Not-Gamma-Final❇beta',
+  type: RiskRecord,
+ }
+
+ object {
+  id: r301,
+  name: 'Magnetic-Wavelet-Reduction-Required❇gamma',
+  type: RiskRecord,
+ }
+
+ operator {
+  id: a301,
+  in: { before: SnapSpine, },
+  name: 'extend-Snap-Spine-Α-to-Β',
+  out: { after: SnapSpine, },
+ }
+
+ operator {
+  id: b302,
+  in: { before: FrozenProbe, },
+  name: 'wrap-Frozen-Probe-Α-to-Probe-Registry-Β',
+  out: { after: ProbeRegistry, },
+ }
+
+ operator {
+  id: b303,
+  in: { before: ProbeCache, },
+  name: 'wrap-Probe-Cache-Α-to-Β',
+  out: { after: ProbeCache, },
+ }
+
+ operator {
+  id: b304,
+  in: { before: VibesProjection, },
+  name: 'promote-Vibes-Projection-Α-to-Β',
+  out: { after: VibesProjection, },
+ }
+
+ operator {
+  id: b305,
+  in: { before: ReceptorGain, },
+  name: 'replace-Receptor-Gain-Α-with-Receptor-Bridge-Β',
+  out: { after: ReceptorBridge, },
+ }
+
+ operator {
+  id: b306,
+  in: { before: ParcelGraph, },
+  name: 'replace-Parcel-Graph-Α-with-Β',
+  out: { after: ParcelGraph, },
+ }
+
+ operator {
+  id: b307,
+  in: { before: LaplacianWalk, },
+  name: 'replace-Laplacian-Walk-Α-with-Runtime-Β',
+  out: { after: LaplacianRuntime, },
+ }
+
+ operator {
+  id: b308,
+  in: { before: TraceReport, },
+  name: 'extend-Trace-Report-Α-to-Disagreement-Width-Β',
+  out: { after: DisagreementWidth, },
+ }
+
+ operator {
+  id: b309,
+  in: { before: TraceReport, },
+  name: 'wrap-Alpha-Reports-into-Requirements-Report-Β',
+  out: { after: RequirementsReport, },
+ }
+
+ operator {
+  id: g301,
+  in: { before: SnapSpine, },
+  name: 'promote-Snap-Spine-Β-to-Probe-Suite-Γ-context',
+  out: { after: ProbeSuite, },
+ }
+
+ operator {
+  id: g302,
+  in: { before: ProbeRegistry, },
+  name: 'extend-Probe-Registry-Β-to-Latent-Axis-Sweep-Γ',
+  out: { after: LatentAxisSweep, },
+ }
+
+ operator {
+  id: g303,
+  in: { before: ProbeCache, },
+  name: 'wrap-Probe-Cache-Β-with-Probe-Validity-Evaluator-Γ',
+  out: { after: ProbeValidityEvaluator, },
+ }
+
+ operator {
+  id: g304,
+  in: { before: VibesProjection, },
+  name: 'extend-Vibes-Projection-Β-to-Prior-Ensemble-Γ',
+  out: { after: PriorEnsemble, },
+ }
+
+ operator {
+  id: g305,
+  in: { before: ReceptorBridge, },
+  name: 'extend-Receptor-Bridge-Β-to-Γ',
+  out: { after: ReceptorBridge, },
+ }
+
+ operator {
+  id: g306,
+  in: { before: ParcelGraph, },
+  name: 'extend-Parcel-Graph-Β-to-Dual-Path-Runtime-Γ',
+  out: { after: DualPathRuntime, },
+ }
+
+ operator {
+  id: g307,
+  in: { before: LaplacianRuntime, },
+  name: 'replace-Laplacian-Runtime-Β-with-Magnetic-Wavelet-Runtime-Γ',
+  out: { after: MagneticWaveletRuntime, },
+ }
+
+ operator {
+  id: g308,
+  in: { before: DisagreementWidth, },
+  name: 'extend-Disagreement-Width-Β-to-Cross-Projection-Readout-Γ',
+  out: { after: CrossProjectionReadout, },
+ }
+
+ operator {
+  id: g309,
+  in: { before: RequirementsReport, },
+  name: 'wrap-Requirements-Report-Β-into-Discovery-Surface-Γ',
+  out: { after: DiscoverySurface, },
+ }
+
+ operator {
+  id: receptor_gain_op,
+  in: { input: VibesProjection, },
+  name: 'compute-receptor-gain',
+  out: { output: ReceptorGain, },
+ }
+
+ operator {
+  id: parcel_gain_op,
+  in: { input: ReceptorBridge, },
+  name: 'project-receptor-gain-to-parcels',
+  out: { output: ParcelGraph, },
+ }
+
+ operator {
+  id: laplacian_walk_op,
+  in: { input: ParcelGraph, },
+  name: 'run-laplacian-walk',
+  out: { output: LaplacianRuntime, },
+ }
+
+ operator {
+  id: receptor_ensemble_op,
+  in: { input: PriorEnsemble, },
+  name: 'compute-receptor-ensemble',
+  out: { output: ReceptorBridge, },
+ }
+
+ operator {
+  id: magnetic_wavelet_op,
+  in: { input: ReceptorBridge, },
+  name: 'run-magnetic-wavelet-runtime',
+  out: { output: MagneticWaveletRuntime, },
+ }
+
+ operator {
+  id: width_energy_op,
+  in: { input: MagneticWaveletRuntime, },
+  name: 'compute-width-energy-readout',
+  out: { output: CrossProjectionReadout, },
+ }
+}
+
+registers {
+ alpha_phase$ra01: PhaseId,
+ beta_phase$rb01: PhaseId,
+ gamma_phase$rg01: PhaseId,
+}
+
+streams {
+}
+
+types {
+ ArtifactIntake,
+ CachePayload,
+ CrossProjectionReadout,
+ DiscoverySurface,
+ DisagreementWidth,
+ DualPathRuntime,
+ EvidenceSource,
+ FrozenProbe,
+ LaplacianRuntime,
+ LaplacianWalk,
+ LatentAxisSweep,
+ MagneticWaveletRuntime,
+ ObservationNode,
+ ParcelGraph,
+ PhaseId,
+ PriorEnsemble,
+ ProbeCache,
+ ProbeRegistry,
+ ProbeSuite,
+ ProbeValidityEvaluator,
+ ReceptorBridge,
+ ReceptorGain,
+ RequirementsReport,
+ RiskRecord,
+ SnapSpine,
+ TraceReport,
+ VibesProjection,
+ string,
+}
+end🪢
