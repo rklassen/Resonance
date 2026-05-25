@@ -1,8 +1,8 @@
-🪢snap gamma-phase-evolution
+🪢snap resonance-implementation-plan
 .graph {
  gen: 0,
  id: gph8,
- name: 'Gamma Phase Evolution Graph',
+ name: 'Resonance Implementation Plan',
  operators: 'ops/resonance/',
  time: 2026-05-24T00:00:00Z,
  types: None,
@@ -101,10 +101,16 @@ edges {
 
 extras {
  convention: {
-  phase-suffixes: 'Α, Β, Γ',
+    phase-suffixes: 'example handles: Α, Β, Γ',
   payload-marker: '❇',
   semantic-names-use-dashes: true,
   snap-ids-remain-ascii: true,
+ },
+ phase-model: {
+    fixed-lifecycle: false,
+    phase-count-variable: true,
+    current-handles-are-examples: true,
+    durable-identity-must-ignore-phase-token: true,
  },
  no-loose-end-states: [
   'verified',
@@ -118,9 +124,9 @@ layout {
 }
 
 literals {
- alpha-phase$la01: string = 'Α',
- beta-phase$lb01: string = 'Β',
- gamma-phase$lg01: string = 'Γ',
+ example-phase-alpha$la01: string = 'Α',
+ example-phase-beta$lb01: string = 'Β',
+ example-phase-gamma$lg01: string = 'Γ',
 }
 
 nodes {

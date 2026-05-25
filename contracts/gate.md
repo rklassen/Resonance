@@ -120,25 +120,38 @@ Accuracy
 Rules:
 
 1. Integration evaluates completeness, determinism, transparency, and declared graph connectivity.
-2. Performance evaluates runtime/resource fitness against declared runtime policy.
-3. Accuracy evaluates phase-valid correctness, not final scientific truth.
+2. Performance evaluates whether behavior delivers what declared semantic labels
+    and contracts indicate.
+3. Accuracy evaluates phase-valid correctness against the declared spec or
+    oracle, not final scientific truth.
 4. The composite truth scalar uses geometric mean, not arithmetic mean.
 5. A zero on any governing axis is a stop-and-surface event.
 6. No axis below `Yes` may be reported without an explicit named follow-up observation.
 
 ## Axis Scale
 
-Use the smallest sufficient scale:
+Use the canonical truth scale when an axis is evaluated:
 
 ```text
-No
-Partial
 Yes
-NotApplicable
-Blocked
+Mostly
+Mixed
+Weak
+Violation
 ```
 
-Do not invent high-resolution confidence unless the evidence supports it.
+Numeric mapping for geometric aggregation:
+
+```text
+Yes = 1.00
+Mostly = 0.75
+Mixed = 0.50
+Weak = 0.25
+Violation = 0.00
+```
+
+`Blocked` and `Deferred` remain gate decisions, not axis values. Use
+`NotApplicable` only for non-governing axes.
 
 ## Geometric Mean Rule
 
