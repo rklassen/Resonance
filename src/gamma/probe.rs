@@ -73,6 +73,43 @@ pub struct GammaLatentSweepSuite {
     pub extensions_disabled: bool,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GammaFailureModeKind {
+    PromptSensitivity,
+    ModelDisagreement,
+    EmbeddingNeighborhoodInstability,
+    LabelCollision,
+    DomainMismatch,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GammaFailureModeDisposition {
+    Clear,
+    Observed,
+    Blocked,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GammaFailureModeAssessment {
+    pub kind: GammaFailureModeKind,
+    pub disposition: GammaFailureModeDisposition,
+    pub detail: String,
+    pub required_follow_up: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GammaAxisValidityAssessment {
+    pub axis: String,
+    pub high_confidence_eligible: bool,
+    pub failure_modes: Vec<GammaFailureModeAssessment>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GammaProbeValiditySuite {
+    pub axes: Vec<GammaAxisValidityAssessment>,
+    pub extensions_disabled: bool,
+}
+
 struct GammaLatentAxisSpec {
     axis: &'static str,
     left_pole: &'static str,
@@ -191,6 +228,66 @@ pub fn run_gamma_latent_sweep_suite(
     }
 
     Ok(GammaLatentSweepSuite {
+        axes,
+        extensions_disabled: false,
+    })
+}
+
+pub fn run_gamma_probe_validity_suite(
+    latent_sweeps: &GammaLatentSweepSuite,
+    config: &GammaConfig,
+) -> Result<GammaProbeValiditySuite, GammaError> {
+    if config.extensions_disabled {
+        return Ok(GammaProbeValiditySuite {
+            axes: Vec::new(),
+            extensions_disabled: true,
+        });
+    }
+
+    let axes = latent_sweeps
+        .axes
+        .iter()
+        .map(|axis| {
+            let failure_modes = vec![
+                prompt_sensitivity_failure(axis),
+                blocked_failure(
+                    GammaFailureModeKind::ModelDisagreement,
+                    "model disagreement is not yet observable for latent-axis sweeps because no comparable alternate latent-axis model has been added",
+                    "add a comparable latent-axis ensemble observable before allowing model-agreement promotions",
+                ),
+                blocked_failure(
+                    GammaFailureModeKind::EmbeddingNeighborhoodInstability,
+                    "embedding-neighborhood instability is not yet observable because gamma does not yet expose neighborhood replay evidence for latent-axis sweeps",
+                    "add a neighborhood replay observable before allowing neighborhood-stability promotions",
+                ),
+                blocked_failure(
+                    GammaFailureModeKind::LabelCollision,
+                    "label collision is not yet observable because gamma does not yet expose a collision matrix for latent-axis labels",
+                    "add latent-axis label collision checks before allowing label-stability promotions",
+                ),
+                blocked_failure(
+                    GammaFailureModeKind::DomainMismatch,
+                    "domain mismatch is not yet observable because gamma does not yet expose domain-fit evidence for latent-axis probes",
+                    "add probe-to-artifact domain-fit evidence before allowing domain-fit promotions",
+                ),
+            ];
+            let high_confidence_eligible = failure_modes
+                .iter()
+                .all(|failure| failure.disposition == GammaFailureModeDisposition::Clear);
+
+            GammaAxisValidityAssessment {
+                axis: axis.axis.clone(),
+                high_confidence_eligible,
+                failure_modes,
+            }
+        })
+        .collect::<Vec<_>>();
+
+    if axes.len() != latent_sweeps.axes.len() {
+        return Err(GammaError::new("gamma probe validity suite must evaluate every latent axis"));
+    }
+
+    Ok(GammaProbeValiditySuite {
         axes,
         extensions_disabled: false,
     })
@@ -362,6 +459,47 @@ fn classify_axis_stability(
     }
 
     GammaLatentAxisStability::Unstable
+}
+
+fn prompt_sensitivity_failure(axis: &GammaLatentAxisSweep) -> GammaFailureModeAssessment {
+    match axis.stability {
+        GammaLatentAxisStability::Stable {
+            ..
+        } => GammaFailureModeAssessment {
+            kind: GammaFailureModeKind::PromptSensitivity,
+            disposition: GammaFailureModeDisposition::Clear,
+            detail: format!(
+                "latent-axis prompt variants remained stable for {} with spread {:.6}",
+                axis.axis, axis.spread
+            ),
+            required_follow_up: None,
+        },
+        GammaLatentAxisStability::Unstable => GammaFailureModeAssessment {
+            kind: GammaFailureModeKind::PromptSensitivity,
+            disposition: GammaFailureModeDisposition::Observed,
+            detail: format!(
+                "latent-axis prompt variants were unstable for {} with spread {:.6}",
+                axis.axis, axis.spread
+            ),
+            required_follow_up: Some(format!(
+                "re-observe {} after adding the remaining G3 failure-mode observables",
+                axis.axis
+            )),
+        },
+    }
+}
+
+fn blocked_failure(
+    kind: GammaFailureModeKind,
+    detail: &str,
+    required_follow_up: &str,
+) -> GammaFailureModeAssessment {
+    GammaFailureModeAssessment {
+        kind,
+        disposition: GammaFailureModeDisposition::Blocked,
+        detail: detail.into(),
+        required_follow_up: Some(required_follow_up.into()),
+    }
 }
 
 #[cfg(test)]

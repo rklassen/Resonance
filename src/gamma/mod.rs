@@ -8,9 +8,11 @@ use crate::{
 };
 
 pub use probe::{
-    run_gamma_latent_sweep_suite, run_gamma_probe_suite, GammaLatentAxisStability,
-    GammaLatentAxisSweep, GammaLatentAxisVariantRun, GammaLatentPromptVariant,
-    GammaLatentSweepSuite, GammaProbeFamily, GammaProbeFamilyRun, GammaProbeSuite,
+    run_gamma_latent_sweep_suite, run_gamma_probe_suite, run_gamma_probe_validity_suite,
+    GammaAxisValidityAssessment, GammaFailureModeAssessment, GammaFailureModeDisposition,
+    GammaFailureModeKind, GammaLatentAxisStability, GammaLatentAxisSweep,
+    GammaLatentAxisVariantRun, GammaLatentPromptVariant, GammaLatentSweepSuite, GammaProbeFamily,
+    GammaProbeFamilyRun, GammaProbeSuite, GammaProbeValiditySuite,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -31,6 +33,7 @@ pub struct GammaRun {
     pub beta: BetaRun,
     pub probe_suite: GammaProbeSuite,
     pub latent_sweeps: GammaLatentSweepSuite,
+    pub probe_validity: GammaProbeValiditySuite,
     pub config: GammaConfig,
 }
 
@@ -102,11 +105,13 @@ fn run_gamma_with_config(
     let probe_suite =
         run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe, &config)?;
     let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact, &config)?;
+    let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps, &config)?;
 
     Ok(GammaRun {
         beta,
         probe_suite,
         latent_sweeps,
+        probe_validity,
         config,
     })
 }

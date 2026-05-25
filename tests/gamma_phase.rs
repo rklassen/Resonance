@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use resonance::{
     run_beta_text, run_gamma_text, run_gamma_text_with_config, AlphaProbeCache, GammaConfig,
-    GammaLatentAxisStability,
+    GammaFailureModeDisposition, GammaFailureModeKind, GammaLatentAxisStability,
 };
 
 const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
@@ -66,6 +66,8 @@ fn gamma_reduces_to_beta_when_extensions_disabled() {
         .all(|family| !family.family.output_contract.is_empty()));
     assert!(gamma.latent_sweeps.extensions_disabled);
     assert!(gamma.latent_sweeps.axes.is_empty());
+    assert!(gamma.probe_validity.extensions_disabled);
+    assert!(gamma.probe_validity.axes.is_empty());
     assert_eq!(gamma.beta.gain.vector, beta.gain.vector);
     assert_eq!(gamma.beta.walk.state_after, beta.walk.state_after);
     assert_eq!(gamma.beta.disagreement.probe_disagreement, beta.disagreement.probe_disagreement,);
@@ -147,6 +149,55 @@ fn gamma_latent_axis_sweeps_mark_stability_per_axis() {
                 let all_right = axis.variants.iter().all(|variant| variant.score >= 0.18);
                 assert!(!(axis.spread <= 0.45 && (all_left || all_right)));
             }
+        }
+    }
+}
+
+#[test]
+fn gamma_probe_validity_blocks_unstable_axis_promotion() {
+    let fixture = serde_json::from_str::<GammaLatentSweepFixture>(G2_LATENT_SWEEP_FIXTURE_JSON)
+        .expect("gamma G2 latent sweep fixture should parse");
+    let mut gamma_cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text_with_config(
+        &mut gamma_cache,
+        &fixture.source,
+        &fixture.text,
+        GammaConfig {
+            extensions_disabled: false,
+        },
+    )
+    .expect("gamma run should succeed");
+
+    assert!(!gamma.probe_validity.extensions_disabled);
+    assert_eq!(gamma.probe_validity.axes.len(), fixture.axes.len());
+
+    for (assessment, expected_axis) in gamma.probe_validity.axes.iter().zip(fixture.axes.iter()) {
+        assert_eq!(assessment.axis, expected_axis.axis);
+        assert!(!assessment.high_confidence_eligible);
+        assert_eq!(assessment.failure_modes.len(), 5);
+
+        let prompt_sensitivity = assessment
+            .failure_modes
+            .iter()
+            .find(|failure| failure.kind == GammaFailureModeKind::PromptSensitivity)
+            .expect("prompt sensitivity assessment should exist");
+        assert_eq!(prompt_sensitivity.disposition, GammaFailureModeDisposition::Observed);
+        assert!(prompt_sensitivity.detail.contains("unstable"));
+        assert!(prompt_sensitivity.required_follow_up.is_some());
+
+        for kind in [
+            GammaFailureModeKind::ModelDisagreement,
+            GammaFailureModeKind::EmbeddingNeighborhoodInstability,
+            GammaFailureModeKind::LabelCollision,
+            GammaFailureModeKind::DomainMismatch,
+        ] {
+            let blocked = assessment
+                .failure_modes
+                .iter()
+                .find(|failure| failure.kind == kind)
+                .expect("blocked failure-mode assessment should exist");
+            assert_eq!(blocked.disposition, GammaFailureModeDisposition::Blocked);
+            assert!(blocked.required_follow_up.is_some());
         }
     }
 }

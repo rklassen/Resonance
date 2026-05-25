@@ -514,6 +514,45 @@ Magnetic-Wavelet-Runtime-Γ	Laplacian-Runtime-Β	replace/extend
 Cross-Projection-Readout-Γ	Disagreement-Width-Β	extend
 Discovery-Surface-Γ	Requirements-Report-Β	wrap
 
+Gamma component status
+
+Legend:
+
+✅ complete and verified
+🔨 under construction
+🔍 status unknown from current repo evidence
+⚠️ known gap that must be finished before gamma is complete
+❌ implemented but non-compliant and requires correction
+
+Current status:
+
+✅ G1 — Probe-Suite-Γ
+Verified by `run_gamma_probe_suite()` and `gamma_reduces_to_beta_when_extensions_disabled()`.
+
+✅ G2 — Latent-Axis-Sweep-Γ
+Verified by the fixture-backed sweep test and direct branch tests for stable-left, stable-right, and spread-gated unstable classification.
+
+✅ G3 — Probe-Validity-Evaluator-Γ
+Verified by the gamma probe-validity evaluator and the unstable-axis promotion guard test.
+
+⚠️ G4 — Prior-Ensemble-Γ
+Planned, but multiple gamma prior sources and their coordinate/blocking checks are not implemented yet.
+
+⚠️ G5 — Receptor-Bridge-Γ
+Planned, but ensemble comparison outputs are not implemented yet.
+
+⚠️ G6 — Dual-Path-Runtime-Γ
+Planned, but objective and narrative path separation is not implemented yet.
+
+⚠️ G7 — Magnetic-Wavelet-Runtime-Γ
+Planned, but phase/wavelet runtime extensions and the beta-reduction invariant are not implemented yet.
+
+⚠️ G8 — Cross-Projection-Readout-Γ
+Planned, but cross-projection disagreement localization is not implemented yet.
+
+⚠️ G9 — Discovery-Surface-Γ
+Planned, but the gamma viewer/export surface and visible-claim trace links are not implemented yet.
+
 ⸻
 
 G1 — Probe-Suite-Γ
