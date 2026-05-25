@@ -7,7 +7,11 @@ use crate::{
     beta::{run_beta_artifact, BetaRun},
 };
 
-pub use probe::{run_gamma_probe_suite, GammaProbeFamily, GammaProbeFamilyRun, GammaProbeSuite};
+pub use probe::{
+    run_gamma_latent_sweep_suite, run_gamma_probe_suite, GammaLatentAxisStability,
+    GammaLatentAxisSweep, GammaLatentAxisVariantRun, GammaLatentPromptVariant,
+    GammaLatentSweepSuite, GammaProbeFamily, GammaProbeFamilyRun, GammaProbeSuite,
+};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GammaConfig {
@@ -26,6 +30,7 @@ impl Default for GammaConfig {
 pub struct GammaRun {
     pub beta: BetaRun,
     pub probe_suite: GammaProbeSuite,
+    pub latent_sweeps: GammaLatentSweepSuite,
     pub config: GammaConfig,
 }
 
@@ -96,10 +101,12 @@ fn run_gamma_with_config(
     let beta = run_beta_artifact(cache, artifact.clone())?;
     let probe_suite =
         run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe, &config)?;
+    let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact, &config)?;
 
     Ok(GammaRun {
         beta,
         probe_suite,
+        latent_sweeps,
         config,
     })
 }

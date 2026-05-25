@@ -1,0 +1,175 @@
+{
+  "source": "artifact://gamma/text/sweeps",
+  "text": "Warm oak, citrus lacquer, and an anxious club pulse keep pulling the room in two directions.",
+  "extensions_disabled": false,
+  "axes": [
+    {
+      "axis": "cheap-premium",
+      "left_pole": "cheap",
+      "right_pole": "premium",
+      "model_id": "model.gamma.latent-axis.v1",
+      "output_contract": "contract.payload.gamma.latent-axis",
+      "mean_score": -0.020490197,
+      "spread": 0.094558828,
+      "stability": "Unstable",
+      "dominant_pole": null,
+      "variants": [
+        {
+          "name": "catalog",
+          "prompt_id": "policy.gamma.latent-axis.cheap-premium.catalog.v1",
+          "score": 0.01485294
+        },
+        {
+          "name": "editorial",
+          "prompt_id": "policy.gamma.latent-axis.cheap-premium.editorial.v1",
+          "score": 0.003382352
+        },
+        {
+          "name": "functional",
+          "prompt_id": "policy.gamma.latent-axis.cheap-premium.functional.v1",
+          "score": -0.079705887
+        }
+      ]
+    },
+    {
+      "axis": "organic-synthetic",
+      "left_pole": "organic",
+      "right_pole": "synthetic",
+      "model_id": "model.gamma.latent-axis.v1",
+      "output_contract": "contract.payload.gamma.latent-axis",
+      "mean_score": 0.036176469,
+      "spread": 0.052941173,
+      "stability": "Unstable",
+      "dominant_pole": null,
+      "variants": [
+        {
+          "name": "catalog",
+          "prompt_id": "policy.gamma.latent-axis.organic-synthetic.catalog.v1",
+          "score": 0.002500003
+        },
+        {
+          "name": "editorial",
+          "prompt_id": "policy.gamma.latent-axis.organic-synthetic.editorial.v1",
+          "score": 0.055441175
+        },
+        {
+          "name": "functional",
+          "prompt_id": "policy.gamma.latent-axis.organic-synthetic.functional.v1",
+          "score": 0.050588232
+        }
+      ]
+    },
+    {
+      "axis": "calm-loud",
+      "left_pole": "calm",
+      "right_pole": "loud",
+      "model_id": "model.gamma.latent-axis.v1",
+      "output_contract": "contract.payload.gamma.latent-axis",
+      "mean_score": 0.017500002,
+      "spread": 0.090294115,
+      "stability": "Unstable",
+      "dominant_pole": null,
+      "variants": [
+        {
+          "name": "catalog",
+          "prompt_id": "policy.gamma.latent-axis.calm-loud.catalog.v1",
+          "score": 0.02514706
+        },
+        {
+          "name": "editorial",
+          "prompt_id": "policy.gamma.latent-axis.calm-loud.editorial.v1",
+          "score": 0.05882353
+        },
+        {
+          "name": "functional",
+          "prompt_id": "policy.gamma.latent-axis.calm-loud.functional.v1",
+          "score": -0.031470586
+        }
+      ]
+    },
+    {
+      "axis": "earthy-neon",
+      "left_pole": "earthy",
+      "right_pole": "neon",
+      "model_id": "model.gamma.latent-axis.v1",
+      "output_contract": "contract.payload.gamma.latent-axis",
+      "mean_score": 0.027647058,
+      "spread": 0.107941173,
+      "stability": "Unstable",
+      "dominant_pole": null,
+      "variants": [
+        {
+          "name": "catalog",
+          "prompt_id": "policy.gamma.latent-axis.earthy-neon.catalog.v1",
+          "score": 0.093088232
+        },
+        {
+          "name": "editorial",
+          "prompt_id": "policy.gamma.latent-axis.earthy-neon.editorial.v1",
+          "score": -0.014852944
+        },
+        {
+          "name": "functional",
+          "prompt_id": "policy.gamma.latent-axis.earthy-neon.functional.v1",
+          "score": 0.004705882
+        }
+      ]
+    },
+    {
+      "axis": "threat-safety",
+      "left_pole": "threat",
+      "right_pole": "safety",
+      "model_id": "model.gamma.latent-axis.v1",
+      "output_contract": "contract.payload.gamma.latent-axis",
+      "mean_score": -0.007598041,
+      "spread": 0.028382353,
+      "stability": "Unstable",
+      "dominant_pole": null,
+      "variants": [
+        {
+          "name": "catalog",
+          "prompt_id": "policy.gamma.latent-axis.threat-safety.catalog.v1",
+          "score": 0.009852939
+        },
+        {
+          "name": "editorial",
+          "prompt_id": "policy.gamma.latent-axis.threat-safety.editorial.v1",
+          "score": -0.014117651
+        },
+        {
+          "name": "functional",
+          "prompt_id": "policy.gamma.latent-axis.threat-safety.functional.v1",
+          "score": -0.018529413
+        }
+      ]
+    },
+    {
+      "axis": "approach-avoidance",
+      "left_pole": "approach",
+      "right_pole": "avoidance",
+      "model_id": "model.gamma.latent-axis.v1",
+      "output_contract": "contract.payload.gamma.latent-axis",
+      "mean_score": -0.004558822,
+      "spread": 0.112499997,
+      "stability": "Unstable",
+      "dominant_pole": null,
+      "variants": [
+        {
+          "name": "catalog",
+          "prompt_id": "policy.gamma.latent-axis.approach-avoidance.catalog.v1",
+          "score": -0.062058818
+        },
+        {
+          "name": "editorial",
+          "prompt_id": "policy.gamma.latent-axis.approach-avoidance.editorial.v1",
+          "score": 0.050441176
+        },
+        {
+          "name": "functional",
+          "prompt_id": "policy.gamma.latent-axis.approach-avoidance.functional.v1",
+          "score": -0.002058824
+        }
+      ]
+    }
+  ]
+}
