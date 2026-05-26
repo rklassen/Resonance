@@ -1,41 +1,12 @@
-use serde::Deserialize;
-
 use resonance::{
     load_public_fixtures, run_beta_text, run_gamma_text, AlphaProbeCache, GammaFailureMode,
     GammaFailureModeDisposition, GammaLatentAxisStability, GammaPriorAlignment, GammaPriorSource,
     GateDecision,
 };
 
-const G2_LATENT_SWEEP_FIXTURE_JSON: &str =
-    include_str!("../artifacts/gamma/g2-latent-axis-sweeps-v1.json");
+mod gamma_phase_support;
 
-#[derive(Debug, Deserialize)]
-struct GammaLatentSweepFixture {
-    source: String,
-    text: String,
-    axes: Vec<GammaLatentAxisFixture>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GammaLatentAxisFixture {
-    axis: String,
-    left_pole: String,
-    right_pole: String,
-    model_id: String,
-    output_contract: String,
-    mean_score: f32,
-    spread: f32,
-    stability: String,
-    dominant_pole: Option<String>,
-    variants: Vec<GammaLatentVariantFixture>,
-}
-
-#[derive(Debug, Deserialize)]
-struct GammaLatentVariantFixture {
-    name: String,
-    prompt_id: String,
-    score: f32,
-}
+use gamma_phase_support::{assert_close, GammaLatentSweepFixture, G2_LATENT_SWEEP_FIXTURE_JSON};
 
 #[test]
 fn gamma_preserves_beta_substrate_while_extending_gamma_surfaces() {
@@ -380,24 +351,21 @@ fn gamma_probe_validity_blocks_unstable_axis_promotion() {
             GammaFailureMode::LabelCollision,
             GammaFailureMode::DomainMismatch,
         ] {
-            let blocked = assessment
+            let observed = assessment
                 .failure_modes
                 .iter()
                 .find(|failure| failure.mode == kind)
-                .expect("blocked failure-mode assessment should exist");
-            assert_eq!(blocked.disposition, GammaFailureModeDisposition::Blocked);
-            assert!(blocked.required_follow_up.is_some());
+                .expect("failure-mode assessment should exist");
+            assert_ne!(observed.disposition, GammaFailureModeDisposition::Blocked);
+            if observed.disposition == GammaFailureModeDisposition::Observed {
+                assert!(observed.required_follow_up.is_some());
+            }
         }
     }
 }
 
-fn assert_close(actual: f32, expected: f32, label: &str) {
-    let delta = (actual - expected).abs();
-    assert!(delta <= 1.0e-6, "{label} drifted: expected {expected:+.9}, got {actual:+.9}");
-}
-
 #[test]
-fn gamma_cross_projection_readout_localizes_disagreement_across_four_pairs() {
+fn gamma_cross_projection_readout_localizes_disagreement_across_five_pairs() {
     let mut cache = AlphaProbeCache::default();
     let gamma = run_gamma_text(
         &mut cache,
@@ -409,7 +377,8 @@ fn gamma_cross_projection_readout_localizes_disagreement_across_four_pairs() {
 
     let readout = &gamma.cross_projection_readout;
 
-    assert_eq!(readout.pairs.len(), 4);
+    assert_eq!(readout.pairs.len(), 5);
+    assert!(readout.pairs.iter().any(|pair| pair.name == "vibes-receptor"));
     let traj = readout.pairs.iter().find(|pair| pair.name == "parcel-trajectory").unwrap();
     assert!(traj.localizer.is_some());
     for pair in &readout.pairs {
@@ -424,5 +393,5 @@ fn gamma_cross_projection_readout_localizes_disagreement_across_four_pairs() {
         readout.claim.support_gate_results,
         vec![readout.gate_result.gate_result_id.clone()],
     );
-    assert!(!readout.trace.blocked_claims.is_empty());
+    assert!(readout.trace.blocked_claims.is_empty());
 }

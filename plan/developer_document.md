@@ -58,18 +58,11 @@ plan/work-package-01-api.md
 
 The existing `requirements.md` is a good base and should not be decimated. It should be updated by folding in the requirement ontology / contract alignment section, not rewritten from scratch.
 
-## 3. Immediate Correction: Stale Implementation Plan
+## 3. Phase Interpretation
 
-The current `plan/implementation-plan.snap` still shows an older fixed-phase framing:
+The current `plan/implementation-plan.snap` already uses the corrected Resonance framing.
 
-```text
-gamma-phase-evolution
-Alpha / Beta / Gamma as apparent fixed lifecycle
-```
-
-That is stale.
-
-Correct interpretation:
+Interpret it as:
 
 ```text
 phase tokens are cognitive handles
@@ -508,15 +501,16 @@ Invalid projected states are blocked from prior bridge.
 
 ## 21. Current Gaps to Close Before Coding Runtime
 
-### G1. Replace or annotate stale `implementation-plan.snap`
+### G1. Keep `implementation-plan.snap` aligned with variable-phase semantics
 
-The current file still looks like a fixed alpha/beta/gamma lifecycle.
+The current file already uses the Resonance implementation-plan naming and
+example-handle phase model.
 
-Required correction:
+Maintain these constraints:
 
 ```text
-make phase count variable
-rename top-level graph to Resonance implementation plan
+keep phase count variable
+keep Resonance graph naming
 treat Alpha/Beta/Gamma as example handles
 preserve only if useful as current local handles
 ```

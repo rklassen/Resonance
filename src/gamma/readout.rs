@@ -1,7 +1,7 @@
 use sha2::{Digest, Sha256};
 
 use crate::{
-    beta::BetaRun, BlockedClaimId, CapabilityId, ClaimRecord, ClaimRecordId, ClaimStatus,
+    beta::BetaRun, CapabilityId, ClaimRecord, ClaimRecordId, ClaimStatus,
     ContractId, DeterminismPolicyId, ExecutionId, FailurePolicyId, FitnessFunctionId, GateDecision,
     GateDeclaration, GateId, GateResult, GateResultId, HashDigest, NumericPolicyId,
     OperatorDeclaration, OperatorExecutionRecord, OperatorId, PayloadId, PayloadRecord, PhaseToken,
@@ -11,10 +11,9 @@ use crate::{
     UtcMinute, ValueRef,
 };
 
-use super::GammaDualPathRuntime;
+use super::{readout_pairs::build_gamma_projection_pairs, GammaDualPathRuntime};
 
 const GAMMA_PHASE: &str = "Γ";
-const DISAGREEMENT_THRESHOLD: f32 = f32::EPSILON;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GammaDisagreementLocalizer {
@@ -52,7 +51,7 @@ pub fn run_gamma_cross_projection_readout(
     beta: &BetaRun,
     dual_path: &GammaDualPathRuntime,
 ) -> SemanticResult<GammaCrossProjectionReadout> {
-    let pairs = build_pairs(beta, dual_path);
+    let pairs = build_gamma_projection_pairs(beta, dual_path)?;
     if pairs.iter().any(|pair| !pair.disagreement.is_finite()) {
         return Err(SemanticError::new("cross-projection readout emitted non-finite disagreement"));
     }
@@ -67,6 +66,7 @@ pub fn run_gamma_cross_projection_readout(
             beta.label_probe.payload.contract.clone(),
             beta.vibes.payload_12d.contract.clone(),
             beta.gain.payload.contract.clone(),
+            dual_path.narrative_path.bridge_payload.contract.clone(),
             beta.walk.payload.contract.clone(),
             dual_path.objective_path.runtime.payload.contract.clone(),
         ],
@@ -87,6 +87,7 @@ pub fn run_gamma_cross_projection_readout(
             beta.label_probe.payload.id.clone(),
             beta.vibes.payload_12d.id.clone(),
             beta.gain.payload.id.clone(),
+            dual_path.narrative_path.bridge_payload.id.clone(),
             beta.walk.payload.id.clone(),
             dual_path.objective_path.runtime.payload.id.clone(),
         ],
@@ -165,6 +166,7 @@ pub fn run_gamma_cross_projection_readout(
             beta.label_probe.payload.id.clone(),
             beta.vibes.payload_12d.id.clone(),
             beta.gain.payload.id.clone(),
+            dual_path.narrative_path.bridge_payload.id.clone(),
             beta.walk.payload.id.clone(),
             dual_path.objective_path.runtime.payload.id.clone(),
             payload.id.clone(),
@@ -178,9 +180,8 @@ pub fn run_gamma_cross_projection_readout(
     let claim = ClaimRecord {
         id: ClaimRecordId("claim-gamma-cross-projection-readout".into()),
         statement: format!(
-            "gamma cross-projection readout over {} evaluated 4 projection pairs; \
-            every disagreement above threshold names a localizer; \
-            vibes-to-receptor pair deferred pending axis mapping",
+            "gamma cross-projection readout over {} evaluated 5 projection pairs; \
+            every disagreement above threshold names a localizer",
             beta.artifact.record.id.0,
         ),
         status: ClaimStatus::DerivedClaim,
@@ -191,6 +192,7 @@ pub fn run_gamma_cross_projection_readout(
             beta.label_probe.payload.id.clone(),
             beta.vibes.payload_12d.id.clone(),
             beta.gain.payload.id.clone(),
+            dual_path.narrative_path.bridge_payload.id.clone(),
             beta.walk.payload.id.clone(),
             dual_path.objective_path.runtime.payload.id.clone(),
             payload.id.clone(),
@@ -229,6 +231,7 @@ pub fn run_gamma_cross_projection_readout(
             beta.label_probe.payload.id.clone(),
             beta.vibes.payload_12d.id.clone(),
             beta.gain.payload.id.clone(),
+            dual_path.narrative_path.bridge_payload.id.clone(),
             beta.walk.payload.id.clone(),
             dual_path.objective_path.runtime.payload.id.clone(),
             payload.id.clone(),
@@ -236,7 +239,7 @@ pub fn run_gamma_cross_projection_readout(
         path: SnapPathRef(format!("snap://gamma/readout/{}", beta.artifact.record.id.0,)),
         gate_results: vec![gate_result.gate_result_id.clone()],
         claims: vec![claim.id.clone()],
-        blocked_claims: vec![BlockedClaimId("blocked-claim-gamma-vibes-receptor-agreement".into())],
+        blocked_claims: Vec::new(),
         replay: ReplayPolicyId("replay.canonical".into()),
         created: UtcMinute(202605250210),
     };
@@ -266,82 +269,11 @@ pub fn run_gamma_cross_projection_readout(
         trace,
         steps: vec![step],
         detail: format!(
-            "cross-projection readout over artifact {} compares 4 projection pairs; \
+            "cross-projection readout over artifact {} compares 5 projection pairs; \
             parcel-trajectory divergence is by design (gamma-objective-runtime operator transforms state)",
             beta.artifact.record.id.0,
         ),
     })
-}
-
-fn build_pairs(beta: &BetaRun, dual_path: &GammaDualPathRuntime) -> Vec<GammaProjectionAgreement> {
-    let probe_probe = {
-        let d = mean_absolute_difference(&beta.embedding_probe.values, &beta.label_probe.values);
-        GammaProjectionAgreement {
-            name: "probe-probe".into(),
-            disagreement: d,
-            localizer: if d > DISAGREEMENT_THRESHOLD {
-                Some(GammaDisagreementLocalizer::Probe("embedding-probe-vs-label-probe".into()))
-            } else {
-                None
-            },
-            detail: "mean absolute difference between 16D embedding probe and 12D label probe \
-                (compared over 12 common dimensions)"
-                .into(),
-        }
-    };
-    let semantic_vibes = {
-        let d = mean_absolute_difference(&beta.label_probe.values, &beta.vibes.signed_12d);
-        GammaProjectionAgreement {
-            name: "semantic-vibes".into(),
-            disagreement: d,
-            localizer: if d > DISAGREEMENT_THRESHOLD {
-                Some(GammaDisagreementLocalizer::Transform("vibes-projection".into()))
-            } else {
-                None
-            },
-            detail: "mean absolute difference between 12D label probe and 12D vibes projection"
-                .into(),
-        }
-    };
-    let receptor_parcel = {
-        let d = mean_absolute_difference(&beta.gain.vector, &beta.walk.state_after);
-        GammaProjectionAgreement {
-            name: "receptor-parcel".into(),
-            disagreement: d,
-            localizer: if d > DISAGREEMENT_THRESHOLD {
-                Some(GammaDisagreementLocalizer::Prior("receptor-gain-terms".into()))
-            } else {
-                None
-            },
-            detail: "mean absolute difference between 360D receptor gain vector and 360D \
-                post-walk parcel state"
-                .into(),
-        }
-    };
-    let parcel_trajectory = {
-        let d = mean_absolute_difference(
-            &beta.walk.state_after,
-            &dual_path.objective_path.runtime.state_after,
-        );
-        GammaProjectionAgreement {
-            name: "parcel-trajectory".into(),
-            disagreement: d,
-            localizer: Some(GammaDisagreementLocalizer::Operator("gamma-objective-runtime".into())),
-            detail:
-                "mean absolute difference between 360D beta walk state and 360D gamma \
-                objective runtime state; divergence is by design (gamma operator transforms parcel)"
-                    .into(),
-        }
-    };
-    vec![probe_probe, semantic_vibes, receptor_parcel, parcel_trajectory]
-}
-
-fn mean_absolute_difference(left: &[f32], right: &[f32]) -> f32 {
-    let w = left.len().min(right.len());
-    if w == 0 {
-        return 0.0;
-    }
-    left[..w].iter().zip(right[..w].iter()).map(|(a, b)| (a - b).abs()).sum::<f32>() / w as f32
 }
 
 fn sha256_hex(parts: &[&[u8]]) -> String {

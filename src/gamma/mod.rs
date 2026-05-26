@@ -1,7 +1,11 @@
 mod discovery;
 mod prior;
 mod probe;
+mod probe_latent;
+mod probe_validity;
+mod probe_validity_checks;
 mod readout;
+mod readout_pairs;
 mod receptor;
 mod runtime;
 
@@ -16,11 +20,14 @@ pub use prior::{
     GammaPriorSource,
 };
 pub use probe::{
-    run_gamma_latent_sweep_suite, run_gamma_probe_suite, run_gamma_probe_validity_suite,
-    GammaAxisValidityAssessment, GammaFailureMode, GammaFailureModeAssessment,
-    GammaFailureModeDisposition, GammaLatentAxisStability, GammaLatentAxisSweep,
-    GammaLatentAxisVariantRun, GammaLatentPromptVariant, GammaLatentSweepSuite, GammaProbeFamily,
-    GammaProbeFamilyRun, GammaProbeSuite, GammaProbeValiditySuite,
+    run_gamma_probe_suite, GammaLatentAxisStability, GammaLatentAxisSweep,
+    GammaLatentAxisVariantRun, GammaLatentPromptVariant, GammaLatentSweepSuite,
+    GammaProbeFamily, GammaProbeFamilyRun, GammaProbeSuite,
+};
+pub use probe_latent::run_gamma_latent_sweep_suite;
+pub use probe_validity::{
+    run_gamma_probe_validity_suite, GammaAxisValidityAssessment, GammaFailureMode,
+    GammaFailureModeAssessment, GammaFailureModeDisposition, GammaProbeValiditySuite,
 };
 pub use readout::{
     run_gamma_cross_projection_readout, GammaCrossProjectionReadout, GammaDisagreementLocalizer,
@@ -84,7 +91,7 @@ fn run_gamma_artifact(
     let probe_suite =
         run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe)?;
     let latent_sweeps = run_gamma_latent_sweep_suite(cache, &artifact)?;
-    let probe_validity = run_gamma_probe_validity_suite(&latent_sweeps)?;
+    let probe_validity = run_gamma_probe_validity_suite(cache, &artifact, &latent_sweeps)?;
     let prior_ensemble = run_gamma_prior_ensemble_suite()?;
     let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain)?;
     let dual_path_runtime = run_gamma_dual_path_runtime(&beta)?;

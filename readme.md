@@ -45,7 +45,7 @@ resonance/
 |  |- lib.rs                 - crate export surface.
 |  |- alpha/                 - alpha-phase runtime implementation.
 |  |- beta/                  - beta-phase privileged-path implementation.
-|  |- gamma/                 - gamma-phase shell and extension seams.
+|  |- gamma/                 - gamma-phase runtime, readout, and discovery surfaces.
 |  `- *.rs                   - shared contracts and top-level data records.
 |- tests/
 |  `- *_phase.rs             - sparse phase-level integration tests.
@@ -82,9 +82,10 @@ is intentionally excluded from the enduring repo index.
 
 ## development process
 
-The development is planned in three principal phases with intermediate
-observation points as defined in the implementation plan and directed graph
-encoded as a snap file. 
+The current implementation plan uses alpha, beta, and gamma as example phase
+handles with intermediate observation points defined in the implementation plan
+and directed graph encoded as a snap file. The phase model is variable; these
+handles are organizational aids rather than durable lifecycle identity.
 
 Consider the development DAG. If you do not see any fatal flaws in it, treat it
 as locked. Rectify the other degrees of freedom in machine inference to fit

@@ -58,10 +58,10 @@ Verified by `run_gamma_probe_suite()` and `gamma_preserves_beta_substrate_while_
 Verified by the fixture-backed sweep test and direct branch tests for stable-left, stable-right, and spread-gated unstable classification.
 
 ✅ G3 — Probe-Validity-Evaluator-Γ
-Verified by the gamma probe-validity evaluator and the unstable-axis promotion guard test.
+Verified by the observational prompt-sensitivity, model-disagreement, neighborhood-instability, label-collision, and domain-mismatch checks in `run_gamma_probe_validity_suite()` plus the unstable-axis promotion gate test.
 
-✅ G4 — Prior-Ensemble-Γ
-Verified by the gamma prior-ensemble observable and the aligned-or-blocked prior test.
+⚠️ G4 — Prior-Ensemble-Γ
+Receptor-map priors are coordinate-aligned and verified by test, but functional gradients, structural connectivity, visual benchmark priors, and imagery priors remain declared blockers rather than installed sources.
 
 ✅ G5 — Receptor-Bridge-Γ
 Verified by the gamma receptor-bridge ensemble observable and the provenanced family comparison test.
@@ -73,10 +73,10 @@ Verified by `run_gamma_dual_path_runtime()` and the independent path-trace test.
 Verified by the directed-phase, wavelet, and recirculation runtime implementation plus the live-path and beta-reduction gamma phase tests.
 
 ✅ G8 — Cross-Projection-Readout-Γ
-Verified by `run_gamma_cross_projection_readout()` and the cross-projection disagreement localization test.
+Verified by `run_gamma_cross_projection_readout()` and the five-pair cross-projection disagreement localization test, including the traced vibes-to-receptor family comparison.
 
-✅ G9 — Discovery-Surface-Γ
-Verified by `run_gamma_discovery_surface()` embedded in `run_gamma_artifact()`; gate O9 passes; snap stable; all G1–G8 claims traceable.
+⚠️ G9 — Discovery-Surface-Γ
+The traced discovery/export surface is implemented and wired through `run_gamma_discovery_surface()`, but the richer discovery viewer/export surface described in the gamma plan is not fully present yet.
 
 Current execution order
 
@@ -86,6 +86,6 @@ Current execution order
 
 Current active milestone
 
-All gamma components G1–G9 are complete. Gamma accepted.
+Gamma remains in progress. G1, G2, G3, G5, G6, G7, and G8 are implemented and verified; G4 still lacks declared non-receptor public priors, and G9 still has only the traced discovery/export surface rather than the richer viewer stack described in the gamma plan.
 
 `#end resonance/implementation-plan.md`
