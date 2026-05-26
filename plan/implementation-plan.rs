@@ -72,11 +72,11 @@ Verified by `run_gamma_dual_path_runtime()` and the independent path-trace test.
 ✅ G7 — Magnetic-Wavelet-Runtime-Γ
 Verified by the directed-phase, wavelet, and recirculation runtime implementation plus the live-path and beta-reduction gamma phase tests.
 
-⚠️ G8 — Cross-Projection-Readout-Γ
-Planned, but cross-projection disagreement localization is not implemented yet.
+✅ G8 — Cross-Projection-Readout-Γ
+Verified by `run_gamma_cross_projection_readout()` and the cross-projection disagreement localization test.
 
-⚠️ G9 — Discovery-Surface-Γ
-Planned, but the gamma viewer/export surface and visible-claim trace links are not implemented yet.
+✅ G9 — Discovery-Surface-Γ
+Verified by `run_gamma_discovery_surface()` embedded in `run_gamma_artifact()`; gate O9 passes; snap stable; all G1–G8 claims traceable.
 
 Current execution order
 
@@ -86,7 +86,6 @@ Current execution order
 
 Current active milestone
 
-The next work package is `G8 — Cross-Projection-Readout-Γ` in
-`implementation-plan-gamma.rs`.
+All gamma components G1–G9 are complete. Gamma accepted.
 
 `#end resonance/implementation-plan.md`

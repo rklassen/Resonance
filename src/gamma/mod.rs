@@ -1,3 +1,4 @@
+mod discovery;
 mod prior;
 mod probe;
 mod readout;
@@ -9,6 +10,7 @@ use crate::{
     beta::{run_beta_artifact, BetaRun},
 };
 
+pub use discovery::{run_gamma_discovery_surface, GammaDiscoverySurface};
 pub use prior::{
     run_gamma_prior_ensemble_suite, GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord,
     GammaPriorSource,
@@ -42,6 +44,7 @@ pub struct GammaRun {
     pub receptor_bridge: GammaReceptorBridgeSuite,
     pub dual_path_runtime: GammaDualPathRuntime,
     pub cross_projection_readout: GammaCrossProjectionReadout,
+    pub discovery_surface: GammaDiscoverySurface,
 }
 
 impl From<crate::alpha::AlphaError> for crate::SemanticError {
@@ -86,6 +89,16 @@ fn run_gamma_artifact(
     let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain)?;
     let dual_path_runtime = run_gamma_dual_path_runtime(&beta)?;
     let cross_projection_readout = run_gamma_cross_projection_readout(&beta, &dual_path_runtime)?;
+    let discovery_surface = run_gamma_discovery_surface(
+        &beta,
+        &probe_suite,
+        &latent_sweeps,
+        &probe_validity,
+        &prior_ensemble,
+        &receptor_bridge,
+        &dual_path_runtime,
+        &cross_projection_readout,
+    )?;
 
     Ok(GammaRun {
         beta,
@@ -96,5 +109,6 @@ fn run_gamma_artifact(
         receptor_bridge,
         dual_path_runtime,
         cross_projection_readout,
+        discovery_surface,
     })
 }
