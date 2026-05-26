@@ -13,6 +13,13 @@ use crate::{
 };
 
 use super::{
+    discovery_formats::{
+        build_gamma_discovery_report, gamma_discovery_snap, GammaDiscoveryReport,
+    },
+    discovery_phase_gates::{
+        build_gamma_phase_gate_report, GammaPhaseGateInputs, GammaPhaseGateReport,
+    },
+    discovery_views::{build_gamma_discovery_views, GammaDiscoveryViews},
     GammaCrossProjectionReadout, GammaDualPathRuntime, GammaLatentAxisStability,
     GammaLatentSweepSuite, GammaPriorEnsembleSuite, GammaProbeSuite, GammaProbeValiditySuite,
     GammaReceptorBridgeSuite,
@@ -28,6 +35,9 @@ pub struct GammaDiscoverySurface {
     pub gate_declaration: GateDeclaration,
     pub gate_result: GateResult,
     pub claim: ClaimRecord,
+    pub views: GammaDiscoveryViews,
+    pub phase_gate_report: GammaPhaseGateReport,
+    pub report: GammaDiscoveryReport,
     pub output: OutputRecord,
     pub trace: TraceRecord,
     pub steps: Vec<TraceStep>,
@@ -311,6 +321,52 @@ pub fn run_gamma_discovery_surface(
         started: Some(execution.created),
         finished: Some(UtcMinute(202605250301)),
     };
+    let snap_text = gamma_discovery_snap(
+        &beta.artifact.record.id.0,
+        &beta.artifact.record.hash.digest_hex,
+        family_count,
+        prior_count,
+        pair_count,
+        receptor_count,
+    );
+    if gamma_discovery_snap(
+        &beta.artifact.record.id.0,
+        &beta.artifact.record.hash.digest_hex,
+        family_count,
+        prior_count,
+        pair_count,
+        receptor_count,
+    ) != snap_text
+    {
+        return Err(SemanticError::new("gamma discovery snap emission was not stable"));
+    }
+    let views = build_gamma_discovery_views(
+        beta,
+        probe_suite,
+        dual_path,
+        readout,
+        &trace,
+        &gate_result,
+        &claim,
+    );
+    let phase_gate_report = build_gamma_phase_gate_report(GammaPhaseGateInputs {
+        beta,
+        probe_suite,
+        prior_ensemble,
+        dual_path,
+        readout,
+        discovery_gate_result: &gate_result,
+        discovery_claim: &claim,
+        discovery_snap_text: &snap_text,
+    });
+    let report = build_gamma_discovery_report(
+        beta,
+        prior_ensemble,
+        &views,
+        &phase_gate_report,
+        &claim,
+        &gate_result,
+    );
     let output = OutputRecord {
         id: OutputId("output-gamma-discovery-surface".into()),
         name: "gamma-discovery-surface-report".into(),
@@ -334,33 +390,11 @@ pub fn run_gamma_discovery_surface(
             readout.gate_result.gate_result_id.clone(),
             gate_result.gate_result_id.clone(),
         ],
-        export: ValueRef(format!(
-            "file://output/reports/gamma-discovery-{}.snap",
-            beta.artifact.record.id.0
-        )),
+        export: report.export.clone(),
         generator: declaration.id.clone(),
         phase: Some(PhaseToken(GAMMA_PHASE.into())),
         created: UtcMinute(202605250300),
     };
-    let snap_text = gamma_discovery_snap(
-        &beta.artifact.record.id.0,
-        &beta.artifact.record.hash.digest_hex,
-        family_count,
-        prior_count,
-        pair_count,
-        receptor_count,
-    );
-    if gamma_discovery_snap(
-        &beta.artifact.record.id.0,
-        &beta.artifact.record.hash.digest_hex,
-        family_count,
-        prior_count,
-        pair_count,
-        receptor_count,
-    ) != snap_text
-    {
-        return Err(SemanticError::new("gamma discovery snap emission was not stable"));
-    }
     Ok(GammaDiscoverySurface {
         declaration,
         execution,
@@ -368,56 +402,14 @@ pub fn run_gamma_discovery_surface(
         gate_declaration,
         gate_result,
         claim,
+        views,
+        phase_gate_report,
+        report,
         output,
         trace,
         steps: vec![step],
         snap_text,
     })
-}
-
-fn gamma_discovery_snap(
-    artifact_id: &str,
-    artifact_hash: &str,
-    probe_families: usize,
-    priors: usize,
-    cross_projection_pairs: usize,
-    receptor_families: usize,
-) -> String {
-    [
-        "🪢snap resonance-gamma-discovery".into(),
-        ".graph {".into(),
-        format!(" id: gamma-discovery-{artifact_id},"),
-        " name: 'resonance-gamma-discovery',".into(),
-        " version: 0.8,".into(),
-        "}".into(),
-        "nodes {".into(),
-        " object { id: g101, name: 'Snap-Spine-Γ', type: SnapSpine, }".into(),
-        " object { id: g102, name: 'Probe-Suite-Γ', type: ProbeSuite, }".into(),
-        " object { id: g103, name: 'Latent-Axis-Sweep-Γ', type: LatentAxisSweep, }".into(),
-        " object { id: g104, name: 'Probe-Validity-Evaluator-Γ', type: ProbeValidity, }".into(),
-        " object { id: g105, name: 'Prior-Ensemble-Γ', type: PriorEnsemble, }".into(),
-        " object { id: g106, name: 'Receptor-Bridge-Γ', type: ReceptorBridge, }".into(),
-        " object { id: g107, name: 'Dual-Path-Runtime-Γ', type: DualPathRuntime, }".into(),
-        " object { id: g108, name: 'Magnetic-Wavelet-Runtime-Γ', type: MagneticWaveletRuntime, }".into(),
-        " object { id: g109, name: 'Cross-Projection-Readout-Γ', type: CrossProjectionReadout, }".into(),
-        " object { id: g110, name: 'Discovery-Surface-Γ', type: DiscoverySurface, }".into(),
-        " object { id: o110, name: 'Observe-Discovery-Surface❇gamma', type: ObservationNode, }".into(),
-        "}".into(),
-        "edges {".into(),
-        " extend { @b109 -> @g101, }".into(),
-        " flow { @g101 -> @g102, @g102 -> @g103, @g103 -> @g104, @g104 -> @g105, @g105 -> @g106, @g106 -> @g107, @g107 -> @g108, @g108 -> @g109, @g109 -> @g110, }".into(),
-        " verify { @g110 -> @o110, }".into(),
-        "}".into(),
-        "registers {".into(),
-        format!(" artifact_id: '{artifact_id}',"),
-        format!(" artifact_hash: '{artifact_hash}',"),
-        format!(" probe_families: '{probe_families}',"),
-        format!(" priors: '{priors}',"),
-        format!(" receptor_families: '{receptor_families}',"),
-        format!(" cross_projection_pairs: '{cross_projection_pairs}',"),
-        "}".into(),
-    ]
-    .join("\n")
 }
 
 fn sha256_hex(parts: &[&[u8]]) -> String {

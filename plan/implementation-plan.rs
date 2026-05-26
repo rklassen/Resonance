@@ -41,6 +41,20 @@ Discovery-Surface-Γ	Requirements-Report-Β	wrap
 
 Gamma component status
 
+Compact progress view
+
+```text
+████ G1 Probe-Suite-Γ
+████ G2 Latent-Axis-Sweep-Γ
+████ G3 Probe-Validity-Evaluator-Γ
+▒▒▒▒ G4 Prior-Ensemble-Γ
+████ G5 Receptor-Bridge-Γ
+████ G6 Dual-Path-Runtime-Γ
+████ G7 Magnetic-Wavelet-Runtime-Γ
+████ G8 Cross-Projection-Readout-Γ
+▓▓▓▓ G9 Discovery-Surface-Γ
+```
+
 Legend:
 
 ✅ complete and verified
@@ -76,7 +90,7 @@ Verified by the directed-phase, wavelet, and recirculation runtime implementatio
 Verified by `run_gamma_cross_projection_readout()` and the five-pair cross-projection disagreement localization test, including the traced vibes-to-receptor family comparison.
 
 ⚠️ G9 — Discovery-Surface-Γ
-The traced discovery/export surface is implemented and wired through `run_gamma_discovery_surface()`, but the richer discovery viewer/export surface described in the gamma plan is not fully present yet.
+The traced discovery surface now emits typed DAG/probe/vibes/receptor/trajectory/disagreement views, an explicit O1–O9 phase-gate report, and Snap export through `run_gamma_discovery_surface()`, but the richer interactive viewer stack described in the gamma plan is not fully present yet.
 
 Current execution order
 
@@ -86,6 +100,6 @@ Current execution order
 
 Current active milestone
 
-Gamma remains in progress. G1, G2, G3, G5, G6, G7, and G8 are implemented and verified; G4 still lacks declared non-receptor public priors, and G9 still has only the traced discovery/export surface rather than the richer viewer stack described in the gamma plan.
+Gamma remains in progress. G1, G2, G3, G5, G6, G7, and G8 are implemented and verified; G4 still lacks declared non-receptor public priors, and G9 still lacks the richer interactive viewer stack even though the typed report/export and phase-gate surfaces are now in place.
 
 `#end resonance/implementation-plan.md`

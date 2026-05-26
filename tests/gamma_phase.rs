@@ -395,3 +395,37 @@ fn gamma_cross_projection_readout_localizes_disagreement_across_five_pairs() {
     );
     assert!(readout.trace.blocked_claims.is_empty());
 }
+
+#[test]
+fn gamma_discovery_surface_emits_phase_gated_report_with_snap_export() {
+    let mut cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text(
+        &mut cache,
+        "artifact://gamma/text/g9",
+        "Warm reflective glass and bright motion hold a tense corridor while a \
+        narrative hum circulates through the scene.",
+    )
+    .expect("gamma run should succeed");
+
+    let discovery = &gamma.discovery_surface;
+
+    assert_eq!(discovery.output.export, discovery.report.export);
+    assert!(discovery.report.export.0.ends_with(".md"));
+    assert!(discovery.report.text.contains("# Gamma Discovery Surface Report"));
+    assert!(discovery.report.text.contains("## Probe Matrix"));
+    assert!(discovery.report.text.contains("## Parcel Trajectory"));
+    assert!(discovery.report.text.contains("## Phase Gate Report"));
+    assert!(discovery.report.text.contains("promotion_decision: Blocked"));
+    assert!(discovery.report.text.contains("graph_spread:"));
+    assert!(discovery.report.text.contains("vibes-receptor"));
+    assert!(discovery.report.text.contains("snap_export: file://output/reports/"));
+    assert!(discovery.report.text.contains("gamma-discovery-"));
+    assert!(discovery.report.text.contains("gate-result-gamma-discovery-surface"));
+    assert_eq!(discovery.phase_gate_report.rows.len(), 9);
+    assert_eq!(discovery.phase_gate_report.rows[8].decision, GateDecision::Pass);
+    assert_eq!(discovery.views.dag_trace.len(), 5);
+    assert_eq!(discovery.views.probe_matrix.len(), 6);
+    assert_eq!(discovery.views.vibes_vector.len(), 12);
+    assert_eq!(discovery.views.parcel_trajectory.len(), gamma.beta.graph.node_count);
+    assert_eq!(discovery.gate_result.decision, GateDecision::Pass);
+}

@@ -1,4 +1,7 @@
 mod discovery;
+mod discovery_formats;
+mod discovery_phase_gates;
+mod discovery_views;
 mod prior;
 mod probe;
 mod probe_latent;
@@ -15,6 +18,9 @@ use crate::{
 };
 
 pub use discovery::{run_gamma_discovery_surface, GammaDiscoverySurface};
+pub use discovery_formats::GammaDiscoveryReport;
+pub use discovery_phase_gates::{GammaPhaseGateReport, GammaPhaseGateRow};
+pub use discovery_views::GammaDiscoveryViews;
 pub use prior::{
     run_gamma_prior_ensemble_suite, GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord,
     GammaPriorSource,
