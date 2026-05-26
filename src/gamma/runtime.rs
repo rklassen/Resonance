@@ -12,7 +12,7 @@ use crate::{
     TraceStepId, UtcMinute, ValueRef,
 };
 
-use super::GammaError;
+use crate::SemanticError;
 
 const GAMMA_PHASE: &str = "Γ";
 
@@ -80,7 +80,7 @@ pub struct GammaDualPathRuntime {
     pub narrative_path: GammaNarrativePath,
 }
 
-pub fn run_gamma_dual_path_runtime(beta: &BetaRun) -> Result<GammaDualPathRuntime, GammaError> {
+pub fn run_gamma_dual_path_runtime(beta: &BetaRun) -> crate::SemanticResult<GammaDualPathRuntime> {
     let narrative_path = narrative::build_narrative_path(beta)?;
 
     Ok(GammaDualPathRuntime {
@@ -92,13 +92,13 @@ pub fn run_gamma_dual_path_runtime(beta: &BetaRun) -> Result<GammaDualPathRuntim
 fn build_objective_path(
     beta: &BetaRun,
     narrative_path: &GammaNarrativePath,
-) -> Result<GammaObjectivePath, GammaError> {
+) -> Result<GammaObjectivePath, SemanticError> {
     let state_seed = build_objective_state_seed(beta);
     if state_seed.len() != beta.graph.node_count {
-        return Err(GammaError::new("gamma objective path must match beta parcel graph width"));
+        return Err(SemanticError::new("gamma objective path must match beta parcel graph width"));
     }
     if state_seed.iter().any(|value| !value.is_finite()) {
-        return Err(GammaError::new("gamma objective path emitted non-finite parcel state"));
+        return Err(SemanticError::new("gamma objective path emitted non-finite parcel state"));
     }
 
     let graph_digest = sha256_hex(&[
@@ -267,14 +267,10 @@ fn build_objective_path(
         &trace.id,
     )?;
     trace.operator_executions.push(narrative_path.bridge_execution.id.clone());
-    trace
-        .operator_executions
-        .push(narrative_path.parcel_feedback.execution.id.clone());
+    trace.operator_executions.push(narrative_path.parcel_feedback.execution.id.clone());
     trace.operator_executions.push(runtime.execution.id.clone());
     trace.payloads.push(narrative_path.bridge_payload.id.clone());
-    trace
-        .payloads
-        .push(narrative_path.parcel_feedback.payload.id.clone());
+    trace.payloads.push(narrative_path.parcel_feedback.payload.id.clone());
     trace.payloads.push(beta.gain.payload.id.clone());
     trace.payloads.push(beta.walk.payload.id.clone());
     trace.payloads.push(runtime.payload.id.clone());

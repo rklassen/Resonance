@@ -10,6 +10,7 @@ pub mod output;
 pub mod payload;
 pub mod probe;
 pub mod requirement;
+pub mod semanticerror;
 pub mod state;
 pub mod trace;
 
@@ -25,5 +26,6 @@ pub use output::*;
 pub use payload::*;
 pub use probe::*;
 pub use requirement::*;
+pub use semanticerror::*;
 pub use state::*;
 pub use trace::*;

@@ -1,7 +1,5 @@
 use crate::beta::{load_public_fixtures, BetaFixturePrior};
 
-use super::GammaError;
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GammaPriorSource {
     ReceptorMaps,
@@ -34,7 +32,7 @@ pub struct GammaPriorEnsembleSuite {
     pub priors: Vec<GammaPriorRecord>,
 }
 
-pub fn run_gamma_prior_ensemble_suite() -> Result<GammaPriorEnsembleSuite, GammaError> {
+pub fn run_gamma_prior_ensemble_suite() -> crate::SemanticResult<GammaPriorEnsembleSuite> {
     let fixtures = load_public_fixtures()?;
     let mut priors = fixtures
         .priors

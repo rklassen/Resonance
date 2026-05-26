@@ -2,9 +2,9 @@ use std::collections::BTreeMap;
 
 use crate::beta::{BetaGain, BetaGainTerm};
 
-use super::{
-    GammaError, GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord, GammaPriorSource,
-};
+use crate::SemanticError;
+
+use super::{GammaPriorAlignment, GammaPriorEnsembleSuite, GammaPriorRecord, GammaPriorSource};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct GammaReceptorFamilyComparison {
@@ -28,7 +28,7 @@ pub struct GammaReceptorBridgeSuite {
 pub fn run_gamma_receptor_bridge_suite(
     prior_ensemble: &GammaPriorEnsembleSuite,
     gain: &BetaGain,
-) -> Result<GammaReceptorBridgeSuite, GammaError> {
+) -> crate::SemanticResult<GammaReceptorBridgeSuite> {
     let aligned_priors = prior_ensemble
         .priors
         .iter()
@@ -49,7 +49,7 @@ pub fn run_gamma_receptor_bridge_suite(
 fn build_receptor_family_comparisons(
     aligned_priors: &[GammaPriorRecord],
     gain_terms: &[BetaGainTerm],
-) -> Result<Vec<GammaReceptorFamilyComparison>, GammaError> {
+) -> Result<Vec<GammaReceptorFamilyComparison>, SemanticError> {
     let aligned_by_id = aligned_priors
         .iter()
         .map(|prior| (prior.prior_id.clone(), prior))
@@ -58,13 +58,13 @@ fn build_receptor_family_comparisons(
 
     for term in gain_terms {
         let Some(prior) = aligned_by_id.get(&term.prior_id) else {
-            return Err(GammaError::new(format!(
+            return Err(SemanticError::new(format!(
                 "gamma receptor bridge missing aligned provenance for gain prior {}",
                 term.prior_id
             )));
         };
         if prior.atlas_id.is_none() || prior.transform_id.is_none() {
-            return Err(GammaError::new(format!(
+            return Err(SemanticError::new(format!(
                 "gamma receptor bridge cannot emit gain fields without provenance for prior {}",
                 term.prior_id
             )));

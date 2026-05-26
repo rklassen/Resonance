@@ -2,7 +2,7 @@ use crate::alpha::{
     run_configured_probe, AlphaArtifact, AlphaProbeCache, AlphaProbeRun, ProbeRecipe,
 };
 
-use super::GammaError;
+use crate::SemanticError;
 
 const LATENT_AXIS_MODEL_ID: &str = "model.gamma.latent-axis.v1";
 const LATENT_AXIS_OUTPUT_CONTRACT: &str = "contract.payload.gamma.latent-axis";
@@ -118,7 +118,7 @@ pub fn run_gamma_probe_suite(
     artifact: &AlphaArtifact,
     core_embedding: &AlphaProbeRun,
     core_affect: &AlphaProbeRun,
-) -> Result<GammaProbeSuite, GammaError> {
+) -> crate::SemanticResult<GammaProbeSuite> {
     let mut families = vec![
         GammaProbeFamilyRun {
             family: GammaProbeFamily {
@@ -153,7 +153,7 @@ pub fn run_gamma_probe_suite(
     }
 
     if families.len() != 6 {
-        return Err(GammaError::new("gamma probe suite must expose six families"));
+        return Err(SemanticError::new("gamma probe suite must expose six families"));
     }
 
     Ok(GammaProbeSuite {
@@ -164,7 +164,7 @@ pub fn run_gamma_probe_suite(
 pub fn run_gamma_latent_sweep_suite(
     cache: &mut AlphaProbeCache,
     artifact: &AlphaArtifact,
-) -> Result<GammaLatentSweepSuite, GammaError> {
+) -> crate::SemanticResult<GammaLatentSweepSuite> {
     let mut axes = Vec::new();
     for axis in latent_axis_specs() {
         let variants = latent_prompt_variants()
@@ -211,7 +211,7 @@ pub fn run_gamma_latent_sweep_suite(
     }
 
     if axes.len() != 6 {
-        return Err(GammaError::new("gamma latent sweep suite must expose six axes"));
+        return Err(SemanticError::new("gamma latent sweep suite must expose six axes"));
     }
 
     Ok(GammaLatentSweepSuite {
@@ -221,7 +221,7 @@ pub fn run_gamma_latent_sweep_suite(
 
 pub fn run_gamma_probe_validity_suite(
     latent_sweeps: &GammaLatentSweepSuite,
-) -> Result<GammaProbeValiditySuite, GammaError> {
+) -> crate::SemanticResult<GammaProbeValiditySuite> {
     let axes = latent_sweeps
         .axes
         .iter()
@@ -262,7 +262,9 @@ pub fn run_gamma_probe_validity_suite(
         .collect::<Vec<_>>();
 
     if axes.len() != latent_sweeps.axes.len() {
-        return Err(GammaError::new("gamma probe validity suite must evaluate every latent axis"));
+        return Err(SemanticError::new(
+            "gamma probe validity suite must evaluate every latent axis",
+        ));
     }
 
     Ok(GammaProbeValiditySuite {

@@ -7,12 +7,14 @@ use crate::{
     TraceId, TraceRecord, TruthAxisId, TruthAxisJudgment, TruthAxisResult, UtcMinute, ValueRef,
 };
 
+use crate::SemanticError;
+
 use super::{
-    canonical_vector, probe_trace_step, sha256_hex, short_id, trace_step, GammaError,
+    canonical_vector, probe_trace_step, sha256_hex, short_id, trace_step,
     GammaNarrativeParcelFeedback, GammaNarrativePath, GAMMA_PHASE,
 };
 
-pub(super) fn build_narrative_path(beta: &BetaRun) -> Result<GammaNarrativePath, GammaError> {
+pub(super) fn build_narrative_path(beta: &BetaRun) -> Result<GammaNarrativePath, SemanticError> {
     let supported_families = beta.gain.terms.iter().fold(
         std::collections::BTreeMap::<String, Vec<f32>>::new(),
         |mut grouped, term| {
@@ -26,7 +28,7 @@ pub(super) fn build_narrative_path(beta: &BetaRun) -> Result<GammaNarrativePath,
         .map(|coefficients| coefficients.iter().sum::<f32>() / coefficients.len() as f32)
         .collect::<Vec<_>>();
     if family_names.is_empty() {
-        return Err(GammaError::new(
+        return Err(SemanticError::new(
             "gamma narrative path must emit at least one receptor family summary",
         ));
     }
@@ -80,7 +82,8 @@ pub(super) fn build_narrative_path(beta: &BetaRun) -> Result<GammaNarrativePath,
         phase: Some(PhaseToken(GAMMA_PHASE.into())),
         created: UtcMinute(202605250203),
     };
-    let parcel_feedback_vector = build_parcel_feedback_vector(&beta.gain.vector, &family_mean_vector);
+    let parcel_feedback_vector =
+        build_parcel_feedback_vector(&beta.gain.vector, &family_mean_vector);
     let parcel_feedback_digest = sha256_hex(&[
         canonical_vector(&parcel_feedback_vector).as_bytes(),
         bridge_payload.id.0.as_bytes(),
@@ -158,7 +161,11 @@ pub(super) fn build_narrative_path(beta: &BetaRun) -> Result<GammaNarrativePath,
             } else {
                 TruthAxisJudgment::Weak
             },
-            numeric_value: Some(if parcel_feedback_valid { 1.0 } else { 0.25 }),
+            numeric_value: Some(if parcel_feedback_valid {
+                1.0
+            } else {
+                0.25
+            }),
             evidence_refs: vec![
                 "observation:parcel-feedback-width-matches-graph".into(),
                 "observation:parcel-feedback-values-are-finite".into(),
@@ -293,6 +300,8 @@ fn build_parcel_feedback_vector(gain_vector: &[f32], family_mean_vector: &[f32])
 
     gain_vector
         .iter()
-        .map(|gain_value| ((signed_mean * 0.5) + (mean_magnitude * 0.5 * gain_value)).clamp(-1.0, 1.0))
+        .map(|gain_value| {
+            ((signed_mean * 0.5) + (mean_magnitude * 0.5 * gain_value)).clamp(-1.0, 1.0)
+        })
         .collect::<Vec<_>>()
 }

@@ -1,9 +1,8 @@
 mod prior;
 mod probe;
+mod readout;
 mod receptor;
 mod runtime;
-
-use std::fmt::{Display, Formatter};
 
 use crate::{
     alpha::{load_image, load_text, AlphaArtifact, AlphaProbeCache},
@@ -20,6 +19,10 @@ pub use probe::{
     GammaFailureModeDisposition, GammaLatentAxisStability, GammaLatentAxisSweep,
     GammaLatentAxisVariantRun, GammaLatentPromptVariant, GammaLatentSweepSuite, GammaProbeFamily,
     GammaProbeFamilyRun, GammaProbeSuite, GammaProbeValiditySuite,
+};
+pub use readout::{
+    run_gamma_cross_projection_readout, GammaCrossProjectionReadout, GammaDisagreementLocalizer,
+    GammaProjectionAgreement,
 };
 pub use receptor::{
     run_gamma_receptor_bridge_suite, GammaReceptorBridgeSuite, GammaReceptorFamilyComparison,
@@ -38,36 +41,16 @@ pub struct GammaRun {
     pub prior_ensemble: GammaPriorEnsembleSuite,
     pub receptor_bridge: GammaReceptorBridgeSuite,
     pub dual_path_runtime: GammaDualPathRuntime,
+    pub cross_projection_readout: GammaCrossProjectionReadout,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct GammaError {
-    message: String,
-}
-
-impl GammaError {
-    pub fn new(message: impl Into<String>) -> Self {
-        Self {
-            message: message.into(),
-        }
-    }
-}
-
-impl Display for GammaError {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
-        formatter.write_str(&self.message)
-    }
-}
-
-impl std::error::Error for GammaError {}
-
-impl From<crate::alpha::AlphaError> for GammaError {
+impl From<crate::alpha::AlphaError> for crate::SemanticError {
     fn from(error: crate::alpha::AlphaError) -> Self {
         Self::new(error.to_string())
     }
 }
 
-impl From<crate::beta::BetaError> for GammaError {
+impl From<crate::beta::BetaError> for crate::SemanticError {
     fn from(error: crate::beta::BetaError) -> Self {
         Self::new(error.to_string())
     }
@@ -77,7 +60,7 @@ pub fn run_gamma_text(
     cache: &mut AlphaProbeCache,
     source: &str,
     text: &str,
-) -> Result<GammaRun, GammaError> {
+) -> crate::SemanticResult<GammaRun> {
     run_gamma_artifact(cache, load_text(source, text))
 }
 
@@ -86,14 +69,14 @@ pub fn run_gamma_image(
     source: &str,
     media_type: &str,
     bytes: &[u8],
-) -> Result<GammaRun, GammaError> {
+) -> crate::SemanticResult<GammaRun> {
     run_gamma_artifact(cache, load_image(source, media_type, bytes))
 }
 
 fn run_gamma_artifact(
     cache: &mut AlphaProbeCache,
     artifact: AlphaArtifact,
-) -> Result<GammaRun, GammaError> {
+) -> crate::SemanticResult<GammaRun> {
     let beta = run_beta_artifact(cache, artifact.clone())?;
     let probe_suite =
         run_gamma_probe_suite(cache, &artifact, &beta.embedding_probe, &beta.label_probe)?;
@@ -102,6 +85,7 @@ fn run_gamma_artifact(
     let prior_ensemble = run_gamma_prior_ensemble_suite()?;
     let receptor_bridge = run_gamma_receptor_bridge_suite(&prior_ensemble, &beta.gain)?;
     let dual_path_runtime = run_gamma_dual_path_runtime(&beta)?;
+    let cross_projection_readout = run_gamma_cross_projection_readout(&beta, &dual_path_runtime)?;
 
     Ok(GammaRun {
         beta,
@@ -111,5 +95,6 @@ fn run_gamma_artifact(
         prior_ensemble,
         receptor_bridge,
         dual_path_runtime,
+        cross_projection_readout,
     })
 }

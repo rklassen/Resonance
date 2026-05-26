@@ -7,9 +7,11 @@ use crate::{
     TraceStepId, TruthAxisId, TruthAxisJudgment, TruthAxisResult, UtcMinute, ValueRef,
 };
 
+use crate::SemanticError;
+
 use super::{
-    canonical_vector, sha256_hex, short_id, GammaError, GammaNarrativeParcelFeedback,
-    GammaObjectiveRuntime, GAMMA_PHASE,
+    canonical_vector, sha256_hex, short_id, GammaNarrativeParcelFeedback, GammaObjectiveRuntime,
+    GAMMA_PHASE,
 };
 
 const DIRECTED_PHASE_STRENGTH: f32 = 0.075;
@@ -39,7 +41,7 @@ pub(super) fn build_objective_runtime(
     objective_payload: &PayloadRecord,
     narrative_feedback: &GammaNarrativeParcelFeedback,
     trace_id: &TraceId,
-) -> Result<(GammaObjectiveRuntime, TraceStep), GammaError> {
+) -> Result<(GammaObjectiveRuntime, TraceStep), SemanticError> {
     let runtime_projection = project_runtime(
         beta,
         state_seed,
@@ -61,7 +63,7 @@ pub(super) fn build_objective_runtime(
         },
     )?;
     if reduction_projection.state_after != beta.walk.state_after {
-        return Err(GammaError::new(
+        return Err(SemanticError::new(
             "gamma objective runtime must reduce to the verified beta laplacian runtime",
         ));
     }
@@ -252,14 +254,16 @@ fn project_runtime(
     state_seed: &[f32],
     parcel_feedback_vector: &[f32],
     controls: RuntimeControls,
-) -> Result<RuntimeProjection, GammaError> {
+) -> Result<RuntimeProjection, SemanticError> {
     if state_seed.len() != beta.graph.node_count {
-        return Err(GammaError::new(
+        return Err(SemanticError::new(
             "gamma objective runtime must preserve beta parcel graph width",
         ));
     }
     if parcel_feedback_vector.len() != beta.graph.node_count {
-        return Err(GammaError::new("gamma objective runtime requires narrative family evidence"));
+        return Err(SemanticError::new(
+            "gamma objective runtime requires narrative family evidence",
+        ));
     }
 
     let state_before = beta.walk.state_before.clone();
@@ -271,15 +275,16 @@ fn project_runtime(
     let directed_phase_base = beta
         .graph
         .apply_directed_phase_term(&state_before, &phase_carrier)
-        .map_err(GammaError::from)?;
+        .map_err(SemanticError::from)?;
     let directed_phase_delta = directed_phase_base
         .iter()
         .map(|value| controls.directed_phase_strength * value)
         .collect::<Vec<_>>();
 
     let wavelet_low_band = beta.walk.laplacian_delta.clone();
-    let wavelet_high_band =
-        normalize_vector(&beta.graph.apply_laplacian(&wavelet_low_band).map_err(GammaError::from)?);
+    let wavelet_high_band = normalize_vector(
+        &beta.graph.apply_laplacian(&wavelet_low_band).map_err(SemanticError::from)?,
+    );
     let wavelet_delta = wavelet_low_band
         .iter()
         .zip(wavelet_high_band.iter())
@@ -306,7 +311,7 @@ fn project_runtime(
         })
         .collect::<Vec<_>>();
     if state_after.iter().any(|value| !value.is_finite()) {
-        return Err(GammaError::new("gamma objective runtime emitted non-finite parcel state"));
+        return Err(SemanticError::new("gamma objective runtime emitted non-finite parcel state"));
     }
 
     Ok(RuntimeProjection {

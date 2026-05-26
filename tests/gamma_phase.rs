@@ -395,3 +395,34 @@ fn assert_close(actual: f32, expected: f32, label: &str) {
     let delta = (actual - expected).abs();
     assert!(delta <= 1.0e-6, "{label} drifted: expected {expected:+.9}, got {actual:+.9}");
 }
+
+#[test]
+fn gamma_cross_projection_readout_localizes_disagreement_across_four_pairs() {
+    let mut cache = AlphaProbeCache::default();
+    let gamma = run_gamma_text(
+        &mut cache,
+        "artifact://gamma/text/g8",
+        "Warm reflective glass and bright motion hold a tense corridor while a narrative hum \
+        circulates through the scene.",
+    )
+    .expect("gamma run should succeed");
+
+    let readout = &gamma.cross_projection_readout;
+
+    assert_eq!(readout.pairs.len(), 4);
+    let traj = readout.pairs.iter().find(|pair| pair.name == "parcel-trajectory").unwrap();
+    assert!(traj.localizer.is_some());
+    for pair in &readout.pairs {
+        assert!(pair.disagreement.is_finite(), "pair {} has non-finite disagreement", pair.name);
+        if pair.disagreement > f32::EPSILON {
+            assert!(pair.localizer.is_some(), "pair {} has no localizer", pair.name);
+        }
+    }
+
+    assert_eq!(readout.gate_result.decision, GateDecision::Pass);
+    assert_eq!(
+        readout.claim.support_gate_results,
+        vec![readout.gate_result.gate_result_id.clone()],
+    );
+    assert!(!readout.trace.blocked_claims.is_empty());
+}
