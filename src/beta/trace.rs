@@ -22,6 +22,7 @@ pub struct BetaTraceReport {
     pub snap_text: String,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn assemble_trace_report(
     fixtures: &BetaPublicFixtures,
     artifact: &AlphaArtifact,

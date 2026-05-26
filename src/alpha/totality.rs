@@ -8,6 +8,7 @@ use super::snap::AlphaSnapDocument;
 use super::vibes::AlphaVibes;
 use super::walk::AlphaWalk;
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn totality_complete(
     artifact: &AlphaArtifact,
     embedding: &AlphaProbeRun,

@@ -238,6 +238,7 @@ fn build_declaration(spec: &ProbeRecipe) -> ProbeDeclaration {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn probe_spec(
     probe_id: &str,
     name: &str,

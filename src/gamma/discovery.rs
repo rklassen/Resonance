@@ -34,6 +34,7 @@ pub struct GammaDiscoverySurface {
     pub snap_text: String,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn run_gamma_discovery_surface(
     beta: &BetaRun,
     probe_suite: &GammaProbeSuite,
@@ -58,7 +59,7 @@ pub fn run_gamma_discovery_surface(
     let digest = sha256_hex(&[
         beta.artifact.record.id.0.as_bytes(),
         readout.payload.id.0.as_bytes(),
-        &family_count.to_string().as_bytes(),
+        family_count.to_string().as_bytes(),
     ]);
 
     let declaration = OperatorDeclaration {
@@ -426,7 +427,6 @@ fn sha256_hex(parts: &[&[u8]]) -> String {
     }
     format!("{:x}", hasher.finalize())
 }
-
 fn short_id(hex: &str) -> String {
     hex.chars().take(12).collect()
 }
